@@ -53,12 +53,12 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i408.TodoRepository>(
       () => _i888.TodoRepositoryImpl(gh<_i214.Isar>()),
     );
+    gh.factory<_i792.SettingsCubit>(
+      () => _i792.SettingsCubit(gh<_i1060.UserPreferencesRepository>()),
+    );
     gh.lazySingleton<_i361.Dio>(
       () => networkModule.dioProd,
       registerFor: {_prod},
-    );
-    gh.factory<_i792.SettingsCubit>(
-      () => _i792.SettingsCubit(gh<_i1060.UserPreferencesRepository>()),
     );
     gh.factory<_i869.TodoBloc>(
       () => _i869.TodoBloc(gh<_i408.TodoRepository>()),
