@@ -1,3 +1,4 @@
+import 'package:injectable/injectable.dart';
 import 'package:isar_community/isar.dart';
 
 import '../../../../core/errors/failure.dart';
@@ -7,6 +8,7 @@ import '../mappers/todo_mapper.dart';
 import '../models/todo_model.dart';
 
 /// Default implementation of [TodoRepository] backed by Isar.
+@LazySingleton(as: TodoRepository)
 class TodoRepositoryImpl implements TodoRepository {
   /// Creates a new [TodoRepositoryImpl] with the given Isar instance.
   TodoRepositoryImpl(this._isar);
