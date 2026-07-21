@@ -21,6 +21,7 @@ import '../widgets/todo_list_item.dart';
 /// same contract applies to any BLoC whose lifespan should span the entire
 /// application session rather than a single route.
 class TodoScreen extends StatelessWidget {
+  /// Creates a [TodoScreen].
   const TodoScreen({super.key});
 
   @override

@@ -10,8 +10,10 @@ import '../../domain/repositories/todo_repository.dart';
 import 'todo_event.dart';
 import 'todo_state.dart';
 
+/// BLoC managing the todo list state.
 @injectable
 class TodoBloc extends Bloc<TodoEvent, TodoState> {
+  /// Creates a bloc backed by the given repository.
   TodoBloc(this._repository) : super(const TodoInitial()) {
     on<TodosUpdated>(_onTodosUpdated);
     on<WatchTodos>(_onWatchTodos);

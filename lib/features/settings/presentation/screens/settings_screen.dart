@@ -8,6 +8,7 @@ import '../cubit/settings_state.dart';
 
 /// Screen displaying user settings and preferences.
 class SettingsScreen extends StatelessWidget {
+  /// Creates a [SettingsScreen].
   const SettingsScreen({super.key});
 
   @override
@@ -71,21 +72,23 @@ class SettingsScreen extends StatelessWidget {
   void _showThemePicker(BuildContext context, UserThemeMode current) {
     showDialog<UserThemeMode>(
       context: context,
-      builder: (context) => SimpleDialog(
-        title: const Text('Choose Theme'),
-        children: UserThemeMode.values.map((mode) {
-          return RadioListTile<UserThemeMode>(
-            title: Text(_themeLabel(mode)),
-            value: mode,
-            groupValue: current,
-            onChanged: (value) {
-              if (value != null) {
-                context.read<SettingsCubit>().updateThemeMode(value);
-                Navigator.of(context).pop();
-              }
-            },
-          );
-        }).toList(),
+      builder: (dialogContext) => RadioGroup<UserThemeMode>(
+        groupValue: current,
+        onChanged: (value) {
+          if (value != null) {
+            context.read<SettingsCubit>().updateThemeMode(value);
+            Navigator.of(dialogContext).pop();
+          }
+        },
+        child: SimpleDialog(
+          title: const Text('Choose Theme'),
+          children: UserThemeMode.values.map((mode) {
+            return RadioListTile<UserThemeMode>(
+              title: Text(_themeLabel(mode)),
+              value: mode,
+            );
+          }).toList(),
+        ),
       ),
     );
   }

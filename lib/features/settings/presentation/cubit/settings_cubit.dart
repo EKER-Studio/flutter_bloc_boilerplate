@@ -8,8 +8,10 @@ import '../../domain/entities/user_preferences.dart';
 import '../../domain/repositories/user_preferences_repository.dart';
 import 'settings_state.dart';
 
+/// Cubit managing user preferences state.
 @injectable
 class SettingsCubit extends Cubit<SettingsState> {
+  /// Creates a cubit backed by the given repository.
   SettingsCubit(this._repository) : super(const SettingsInitial());
 
   final UserPreferencesRepository _repository;
@@ -36,12 +38,12 @@ class SettingsCubit extends Cubit<SettingsState> {
     );
   }
 
+  /// Persists the selected theme mode. Reverts to the last known preferences
+  /// on failure so the UI does not get stuck in an error state.
   Future<void> updateThemeMode(UserThemeMode mode) async {
     final snapshot = _lastKnownPreferences;
     final result = await _repository.updateThemeMode(mode);
     if (result.$2 != null) {
-      // Revert to the last known valid preferences so the UI does not get
-      // stuck on a fatal error state.
       if (snapshot != null) {
         emit(SettingsLoadSuccess(snapshot));
       } else {
@@ -50,6 +52,8 @@ class SettingsCubit extends Cubit<SettingsState> {
     }
   }
 
+  /// Persists the notifications toggle. Reverts to the last known preferences
+  /// on failure so the UI does not get stuck in an error state.
   Future<void> updateNotificationsEnabled(bool enabled) async {
     final snapshot = _lastKnownPreferences;
     final result = await _repository.updateNotificationsEnabled(enabled);
