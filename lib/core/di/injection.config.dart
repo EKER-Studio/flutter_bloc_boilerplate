@@ -18,9 +18,12 @@ import '../../features/settings/data/repositories/user_preferences_repository_im
     as _i969;
 import '../../features/settings/domain/repositories/user_preferences_repository.dart'
     as _i1060;
+import '../../features/settings/presentation/cubit/settings_cubit.dart'
+    as _i792;
 import '../../features/todos/data/repositories/todo_repository_impl.dart'
     as _i888;
 import '../../features/todos/domain/repositories/todo_repository.dart' as _i408;
+import '../../features/todos/presentation/bloc/todo_bloc.dart' as _i869;
 import '../database/database_module.dart' as _i215;
 import '../network/network_module.dart' as _i200;
 
@@ -53,6 +56,12 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i361.Dio>(
       () => networkModule.dioProd,
       registerFor: {_prod},
+    );
+    gh.factory<_i792.SettingsCubit>(
+      () => _i792.SettingsCubit(gh<_i1060.UserPreferencesRepository>()),
+    );
+    gh.factory<_i869.TodoBloc>(
+      () => _i869.TodoBloc(gh<_i408.TodoRepository>()),
     );
     return this;
   }
