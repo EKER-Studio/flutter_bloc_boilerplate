@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:injectable/injectable.dart';
 
 /// Registers environment-scoped [Dio] HTTP client instances.
@@ -28,15 +29,17 @@ abstract class NetworkModule {
       ),
     );
 
-    dio.interceptors.addAll([
-      LogInterceptor(
-        request: true,
-        requestHeader: true,
-        responseHeader: false,
-        responseBody: true,
-        error: true,
-      ),
-    ]);
+    if (!kReleaseMode) {
+      dio.interceptors.add(
+        LogInterceptor(
+          request: true,
+          requestHeader: true,
+          responseHeader: false,
+          responseBody: true,
+          error: true,
+        ),
+      );
+    }
 
     return dio;
   }

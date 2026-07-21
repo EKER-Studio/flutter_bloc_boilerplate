@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:intl/intl.dart';
 
 import '../../domain/entities/todo.dart';
 import '../bloc/todo_bloc.dart';
@@ -77,7 +76,7 @@ class TodoDetailScreen extends StatelessWidget {
               style: Theme.of(context).textTheme.labelMedium,
             ),
             const SizedBox(height: 4),
-            Text(_dateFormat.format(todo.createdAt)),
+            Text(_formatDate(todo.createdAt)),
           ],
         ),
       ),
@@ -85,4 +84,11 @@ class TodoDetailScreen extends StatelessWidget {
   }
 }
 
-final _dateFormat = DateFormat('yyyy-MM-dd HH:mm');
+String _formatDate(DateTime date) {
+  final y = date.year.toString().padLeft(4, '0');
+  final mo = date.month.toString().padLeft(2, '0');
+  final d = date.day.toString().padLeft(2, '0');
+  final h = date.hour.toString().padLeft(2, '0');
+  final mi = date.minute.toString().padLeft(2, '0');
+  return '$y-$mo-$d $h:$mi';
+}
