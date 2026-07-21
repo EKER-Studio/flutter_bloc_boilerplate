@@ -21,7 +21,7 @@ class App extends StatelessWidget {
           create: (_) => GetIt.instance<TodoBloc>()..add(const WatchTodos()),
         ),
         BlocProvider<SettingsCubit>(
-          create: (_) => GetIt.instance<SettingsCubit>(),
+          create: (_) => GetIt.instance<SettingsCubit>()..init(),
         ),
       ],
       child: const _AppView(),

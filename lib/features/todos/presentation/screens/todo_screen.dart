@@ -11,6 +11,15 @@ import '../widgets/add_todo_fab.dart';
 import '../widgets/todo_list_item.dart';
 
 /// Screen displaying the list of todo items.
+///
+/// ## Dependency scope contract
+///
+/// Both [TodoBloc] and [SettingsCubit] are provided at the `App` level via
+/// `MultiBlocProvider` in `lib/app.dart`. This ensures that navigating to the
+/// settings screen (which sits outside the todo navigation stack) does not lose
+/// BLoC context — the widgets remain within the same provider ancestry. The
+/// same contract applies to any BLoC whose lifespan should span the entire
+/// application session rather than a single route.
 class TodoScreen extends StatelessWidget {
   const TodoScreen({super.key});
 

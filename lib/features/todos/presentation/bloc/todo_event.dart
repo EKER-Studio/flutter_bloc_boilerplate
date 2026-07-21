@@ -1,3 +1,5 @@
+import '../../domain/entities/todo.dart';
+
 sealed class TodoEvent {
   const TodoEvent();
 }
@@ -26,4 +28,12 @@ class TodoDeleted extends TodoEvent {
 
 class TodoRestored extends TodoEvent {
   const TodoRestored();
+}
+
+/// Internal event emitted by the watch stream subscription when the repository
+/// reports an updated todo list. Not intended to be dispatched from the UI.
+class TodosUpdated extends TodoEvent {
+  const TodosUpdated(this.todos);
+
+  final List<Todo> todos;
 }

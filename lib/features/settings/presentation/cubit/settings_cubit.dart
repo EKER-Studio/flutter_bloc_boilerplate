@@ -10,34 +10,55 @@ import 'settings_state.dart';
 
 @injectable
 class SettingsCubit extends Cubit<SettingsState> {
-  SettingsCubit(this._repository) : super(const SettingsInitial()) {
-    _startWatching();
-  }
+  SettingsCubit(this._repository) : super(const SettingsInitial());
 
   final UserPreferencesRepository _repository;
   StreamSubscription<UserPreferences>? _prefsSubscription;
+  UserPreferences? _lastKnownPreferences;
 
-  void _startWatching() {
+  /// Initialises the cubit: starts watching the preferences stream and emits
+  /// the current value. Must be called once immediately after creation.
+  void init() {
     emit(const SettingsLoadInProgress());
     _prefsSubscription?.cancel();
     _prefsSubscription = _repository.watch().listen(
-      (prefs) => emit(SettingsLoadSuccess(prefs)),
-      onError: (Object error) =>
-          emit(SettingsLoadFailure(DatabaseFailure(error.toString()))),
+      (prefs) {
+        _lastKnownPreferences = prefs;
+        emit(SettingsLoadSuccess(prefs));
+      },
+      onError: (Object error) {
+        if (_lastKnownPreferences != null) {
+          emit(SettingsLoadSuccess(_lastKnownPreferences!));
+        } else {
+          emit(SettingsLoadFailure(DatabaseFailure(error.toString())));
+        }
+      },
     );
   }
 
   Future<void> updateThemeMode(UserThemeMode mode) async {
+    final snapshot = _lastKnownPreferences;
     final result = await _repository.updateThemeMode(mode);
     if (result.$2 != null) {
-      emit(SettingsLoadFailure(result.$2!));
+      // Revert to the last known valid preferences so the UI does not get
+      // stuck on a fatal error state.
+      if (snapshot != null) {
+        emit(SettingsLoadSuccess(snapshot));
+      } else {
+        emit(SettingsLoadFailure(result.$2!));
+      }
     }
   }
 
   Future<void> updateNotificationsEnabled(bool enabled) async {
+    final snapshot = _lastKnownPreferences;
     final result = await _repository.updateNotificationsEnabled(enabled);
     if (result.$2 != null) {
-      emit(SettingsLoadFailure(result.$2!));
+      if (snapshot != null) {
+        emit(SettingsLoadSuccess(snapshot));
+      } else {
+        emit(SettingsLoadFailure(result.$2!));
+      }
     }
   }
 

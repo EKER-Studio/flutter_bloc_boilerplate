@@ -9,7 +9,7 @@ import '../../../../helpers/fake_user_preferences_repository.dart';
 
 void main() {
   testWidgets('Settings screen renders with preferences', (tester) async {
-    final cubit = SettingsCubit(FakeUserPreferencesRepository());
+    final cubit = SettingsCubit(FakeUserPreferencesRepository())..init();
 
     await tester.pumpWidget(
       BlocProvider.value(
