@@ -1,3 +1,6 @@
+import 'dart:async';
+import 'dart:developer';
+
 import 'package:injectable/injectable.dart';
 import 'package:isar_community/isar.dart';
 
@@ -35,14 +38,33 @@ class UserPreferencesRepositoryImpl implements UserPreferencesRepository {
 
   @override
   Stream<UserPreferences> watch() {
-    return _isar.userPreferencesModels
-        .watchObject(userPreferencesSingletonId, fireImmediately: true)
-        .map(_mapOrDefault)
-        .handleError((Object error, StackTrace stack) {
-          throw DatabaseFailure(
-            'Failed to watch preferences: ${error.toString()}',
-          );
-        });
+    return _watchWithReconnect(
+      () => _isar.userPreferencesModels
+          .watchObject(userPreferencesSingletonId, fireImmediately: true)
+          .map(_mapOrDefault),
+      'watch',
+    );
+  }
+
+  /// Wraps an Isar watch stream in an auto-reconnecting loop so transient
+  /// database errors don't permanently terminate the subscription.
+  Stream<T> _watchWithReconnect<T>(
+    Stream<T> Function() createStream,
+    String label,
+  ) async* {
+    while (true) {
+      try {
+        yield* createStream();
+        return;
+      } catch (e, s) {
+        log(
+          'Isar watch stream "$label" error, reconnecting in 1s',
+          error: e,
+          stackTrace: s,
+        );
+        await Future<void>.delayed(const Duration(seconds: 1));
+      }
+    }
   }
 
   @override

@@ -1,3 +1,6 @@
+import 'dart:async';
+import 'dart:developer';
+
 import 'package:injectable/injectable.dart';
 import 'package:isar_community/isar.dart';
 
@@ -17,26 +20,46 @@ class TodoRepositoryImpl implements TodoRepository {
 
   @override
   Stream<List<Todo>> watchAll() {
-    return _isar.todoModels
-        .where()
-        .sortByCreatedAtDesc()
-        .watch(fireImmediately: true)
-        .map((models) => models.map((m) => m.toEntity()).toList())
-        .handleError((Object error, StackTrace stack) {
-          throw DatabaseFailure('Failed to watch todos: ${error.toString()}');
-        });
+    return _watchWithReconnect(
+      () => _isar.todoModels
+          .where()
+          .sortByCreatedAtDesc()
+          .watch(fireImmediately: true)
+          .map((models) => models.map((m) => m.toEntity()).toList()),
+      'watchAll',
+    );
   }
 
   @override
   Stream<Todo?> watchById(int id) {
-    return _isar.todoModels
-        .watchObject(id, fireImmediately: true)
-        .map((model) => model?.toEntity())
-        .handleError((Object error, StackTrace stack) {
-          throw DatabaseFailure(
-            'Failed to watch todo $id: ${error.toString()}',
-          );
-        });
+    return _watchWithReconnect(
+      () => _isar.todoModels
+          .watchObject(id, fireImmediately: true)
+          .map((model) => model?.toEntity()),
+      'watchById($id)',
+    );
+  }
+
+  /// Wraps an Isar watch stream in an auto-reconnecting loop so transient
+  /// database errors don't permanently terminate the subscription. The
+  /// calling BLoC can rely on the stream staying alive.
+  Stream<T> _watchWithReconnect<T>(
+    Stream<T> Function() createStream,
+    String label,
+  ) async* {
+    while (true) {
+      try {
+        yield* createStream();
+        return;
+      } catch (e, s) {
+        log(
+          'Isar watch stream "$label" error, reconnecting in 1s',
+          error: e,
+          stackTrace: s,
+        );
+        await Future<void>.delayed(const Duration(seconds: 1));
+      }
+    }
   }
 
   @override

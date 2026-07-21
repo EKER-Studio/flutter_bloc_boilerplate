@@ -5,6 +5,7 @@ import '../../domain/entities/todo.dart';
 import '../bloc/todo_bloc.dart';
 import '../bloc/todo_event.dart';
 import '../bloc/todo_state.dart';
+import '../shared/format.dart';
 
 /// Screen displaying the details of a single todo item.
 class TodoDetailScreen extends StatelessWidget {
@@ -76,7 +77,7 @@ class TodoDetailScreen extends StatelessWidget {
               style: Theme.of(context).textTheme.labelMedium,
             ),
             const SizedBox(height: 4),
-            Text(_formatDate(todo.createdAt)),
+            Text(formatTodoDate(todo.createdAt)),
           ],
         ),
       ),
@@ -84,11 +85,4 @@ class TodoDetailScreen extends StatelessWidget {
   }
 }
 
-String _formatDate(DateTime date) {
-  final y = date.year.toString().padLeft(4, '0');
-  final mo = date.month.toString().padLeft(2, '0');
-  final d = date.day.toString().padLeft(2, '0');
-  final h = date.hour.toString().padLeft(2, '0');
-  final mi = date.minute.toString().padLeft(2, '0');
-  return '$y-$mo-$d $h:$mi';
-}
+
