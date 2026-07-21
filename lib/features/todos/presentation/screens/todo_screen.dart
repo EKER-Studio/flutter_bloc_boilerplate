@@ -50,8 +50,7 @@ class TodoScreen extends StatelessWidget {
                 ..hideCurrentSnackBar()
                 ..showSnackBar(
                   SnackBar(
-                    content:
-                        Text('Deleted "${state.lastDeletedTodo!.title}"'),
+                    content: Text('Deleted "${state.lastDeletedTodo!.title}"'),
                     action: SnackBarAction(
                       label: 'Undo',
                       onPressed: () =>
@@ -68,10 +67,15 @@ class TodoScreen extends StatelessWidget {
           return switch (state) {
             TodoInitial() => const SizedBox.shrink(),
             TodoLoadInProgress() => _buildLoading(),
-            TodoLoadSuccess(:final todos, :final lastDeletedTodo) =>
-              _buildList(context, todos, lastDeletedTodo),
-            TodoLoadFailure(:final failure) =>
-              _buildError(context, failure.userMessage),
+            TodoLoadSuccess(:final todos, :final lastDeletedTodo) => _buildList(
+              context,
+              todos,
+              lastDeletedTodo,
+            ),
+            TodoLoadFailure(:final failure) => _buildError(
+              context,
+              failure.userMessage,
+            ),
           };
         },
       ),
@@ -99,9 +103,7 @@ class TodoScreen extends StatelessWidget {
             icon: const Icon(Icons.settings_outlined),
             onPressed: () {
               Navigator.of(context).push(
-                MaterialPageRoute<void>(
-                  builder: (_) => const SettingsScreen(),
-                ),
+                MaterialPageRoute<void>(builder: (_) => const SettingsScreen()),
               );
             },
           ),
@@ -115,12 +117,10 @@ class TodoScreen extends StatelessWidget {
                 final todo = todos[index];
                 return TodoListItem(
                   todo: todo,
-                  onToggle: () => context
-                      .read<TodoBloc>()
-                      .add(TodoToggled(todo.id)),
-                  onDelete: () => context
-                      .read<TodoBloc>()
-                      .add(TodoDeleted(todo.id)),
+                  onToggle: () =>
+                      context.read<TodoBloc>().add(TodoToggled(todo.id)),
+                  onDelete: () =>
+                      context.read<TodoBloc>().add(TodoDeleted(todo.id)),
                 );
               },
             ),
@@ -142,8 +142,7 @@ class TodoScreen extends StatelessWidget {
             Text('Error: $message'),
             const SizedBox(height: 16),
             FilledButton(
-              onPressed: () =>
-                  context.read<TodoBloc>().add(const WatchTodos()),
+              onPressed: () => context.read<TodoBloc>().add(const WatchTodos()),
               child: const Text('Retry'),
             ),
           ],

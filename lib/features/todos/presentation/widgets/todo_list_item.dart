@@ -73,5 +73,3 @@ class TodoListItem extends StatelessWidget {
     );
   }
 }
-
-

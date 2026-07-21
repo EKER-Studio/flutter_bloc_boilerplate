@@ -35,15 +35,11 @@ class TodoBloc extends Bloc<TodoEvent, TodoState> {
     _todosSubscription?.cancel();
     _todosSubscription = _repository.watchAll().listen(
       (todos) => add(TodosUpdated(todos)),
-      onError: (Object error) =>
-          add(TodosUpdated(<Todo>[])),
+      onError: (Object error) => add(TodosUpdated(<Todo>[])),
     );
   }
 
-  void _onTodosUpdated(
-    TodosUpdated event,
-    Emitter<TodoState> emit,
-  ) {
+  void _onTodosUpdated(TodosUpdated event, Emitter<TodoState> emit) {
     emit(
       TodoLoadSuccess(
         todos: event.todos,
@@ -73,9 +69,7 @@ class TodoBloc extends Bloc<TodoEvent, TodoState> {
         emit(TodoLoadFailure(result.$2!));
       }
     } catch (e) {
-      emit(
-        TodoLoadFailure(DatabaseFailure('Toggle failed: ${e.toString()}')),
-      );
+      emit(TodoLoadFailure(DatabaseFailure('Toggle failed: ${e.toString()}')));
     }
   }
 
@@ -100,9 +94,7 @@ class TodoBloc extends Bloc<TodoEvent, TodoState> {
       }
     } catch (e) {
       if (_undoQueue.isNotEmpty) _undoQueue.removeLast();
-      emit(
-        TodoLoadFailure(DatabaseFailure('Delete failed: ${e.toString()}')),
-      );
+      emit(TodoLoadFailure(DatabaseFailure('Delete failed: ${e.toString()}')));
     }
   }
 
@@ -119,9 +111,7 @@ class TodoBloc extends Bloc<TodoEvent, TodoState> {
         emit(TodoLoadFailure(result.$2!));
       }
     } catch (e) {
-      emit(
-        TodoLoadFailure(DatabaseFailure('Restore failed: ${e.toString()}')),
-      );
+      emit(TodoLoadFailure(DatabaseFailure('Restore failed: ${e.toString()}')));
     }
   }
 

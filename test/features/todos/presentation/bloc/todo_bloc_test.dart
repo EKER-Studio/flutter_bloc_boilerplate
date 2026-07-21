@@ -107,10 +107,7 @@ void main() {
       'WatchTodos emits LoadInProgress then LoadSuccess',
       build: () => TodoBloc(repository),
       act: (bloc) => bloc.add(const WatchTodos()),
-      expect: () => [
-        const TodoLoadInProgress(),
-        isA<TodoLoadSuccess>(),
-      ],
+      expect: () => [const TodoLoadInProgress(), isA<TodoLoadSuccess>()],
     );
 
     group('TodoAdded', () {
@@ -186,20 +183,14 @@ void main() {
               .having((s) => s.lastDeletedTodo, 'initial undo', isNull),
           isA<TodoLoadSuccess>()
               .having((s) => s.todos.length, 'after delete count', 0)
-              .having(
-                (s) => s.lastDeletedTodo,
-                'after delete undo',
-                isNotNull,
-              ),
+              .having((s) => s.lastDeletedTodo, 'after delete undo', isNotNull),
         ],
       );
 
       blocTest<TodoBloc, TodoState>(
         'rapid consecutive deletes: queue preserves each deleted todo',
         build: () {
-          final repo = FakeTodoRepository(
-            initialTodos: [_created, _second],
-          );
+          final repo = FakeTodoRepository(initialTodos: [_created, _second]);
           return TodoBloc(repo);
         },
         act: (bloc) async {
@@ -211,22 +202,17 @@ void main() {
         },
         expect: () => [
           const TodoLoadInProgress(),
-          isA<TodoLoadSuccess>()
-              .having((s) => s.todos.length, 'initial count', 2),
+          isA<TodoLoadSuccess>().having(
+            (s) => s.todos.length,
+            'initial count',
+            2,
+          ),
           isA<TodoLoadSuccess>()
               .having((s) => s.todos.length, 'after delete 2 count', 1)
-              .having(
-                (s) => s.lastDeletedTodo!.id,
-                'last deleted',
-                2,
-              ),
+              .having((s) => s.lastDeletedTodo!.id, 'last deleted', 2),
           isA<TodoLoadSuccess>()
               .having((s) => s.todos.length, 'after delete 1 count', 0)
-              .having(
-                (s) => s.lastDeletedTodo!.id,
-                'last deleted',
-                1,
-              ),
+              .having((s) => s.lastDeletedTodo!.id, 'last deleted', 1),
         ],
       );
 
@@ -247,8 +233,11 @@ void main() {
         expect: () => [
           const TodoLoadInProgress(),
           isA<TodoLoadSuccess>(),
-          isA<TodoLoadFailure>()
-              .having((s) => s.failure.message, 'message', contains('delete')),
+          isA<TodoLoadFailure>().having(
+            (s) => s.failure.message,
+            'message',
+            contains('delete'),
+          ),
         ],
       );
     });
@@ -269,17 +258,19 @@ void main() {
         },
         expect: () => [
           const TodoLoadInProgress(),
-          isA<TodoLoadSuccess>()
-              .having((s) => s.todos.length, 'initial count', 1),
-          isA<TodoLoadSuccess>()
-              .having((s) => s.todos.length, 'after delete count', 0),
+          isA<TodoLoadSuccess>().having(
+            (s) => s.todos.length,
+            'initial count',
+            1,
+          ),
+          isA<TodoLoadSuccess>().having(
+            (s) => s.todos.length,
+            'after delete count',
+            0,
+          ),
           isA<TodoLoadSuccess>()
               .having((s) => s.todos.length, 'after restore count', 1)
-              .having(
-                (s) => s.lastDeletedTodo,
-                'undo cleared',
-                isNull,
-              ),
+              .having((s) => s.lastDeletedTodo, 'undo cleared', isNull),
         ],
       );
 
@@ -291,10 +282,7 @@ void main() {
           await Future<void>.delayed(Duration.zero);
           bloc.add(const TodoRestored());
         },
-        expect: () => [
-          const TodoLoadInProgress(),
-          isA<TodoLoadSuccess>(),
-        ],
+        expect: () => [const TodoLoadInProgress(), isA<TodoLoadSuccess>()],
       );
     });
 
@@ -316,8 +304,11 @@ void main() {
         expect: () => [
           const TodoLoadInProgress(),
           isA<TodoLoadSuccess>(),
-          isA<TodoLoadFailure>()
-              .having((s) => s.failure.message, 'message', contains('add')),
+          isA<TodoLoadFailure>().having(
+            (s) => s.failure.message,
+            'message',
+            contains('add'),
+          ),
         ],
       );
 
@@ -338,12 +329,11 @@ void main() {
         expect: () => [
           const TodoLoadInProgress(),
           isA<TodoLoadSuccess>(),
-          isA<TodoLoadFailure>()
-              .having(
-                (s) => s.failure.message,
-                'message',
-                contains('toggle'),
-              ),
+          isA<TodoLoadFailure>().having(
+            (s) => s.failure.message,
+            'message',
+            contains('toggle'),
+          ),
         ],
       );
     });
@@ -356,10 +346,7 @@ void main() {
         await Future<void>.delayed(Duration.zero);
         await bloc.close();
       },
-      expect: () => [
-        const TodoLoadInProgress(),
-        isA<TodoLoadSuccess>(),
-      ],
+      expect: () => [const TodoLoadInProgress(), isA<TodoLoadSuccess>()],
     );
   });
 }

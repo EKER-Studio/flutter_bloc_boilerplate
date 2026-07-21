@@ -20,9 +20,9 @@ class TodoDetailScreen extends StatelessWidget {
           current is TodoLoadSuccess &&
           current.todos.where((t) => t.id == todoId).isEmpty,
       listener: (context, state) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Todo was deleted')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Todo was deleted')));
         Navigator.of(context).pop();
       },
       child: BlocBuilder<TodoBloc, TodoState>(
@@ -72,10 +72,7 @@ class TodoDetailScreen extends StatelessWidget {
               },
             ),
             const Divider(),
-            Text(
-              'Created',
-              style: Theme.of(context).textTheme.labelMedium,
-            ),
+            Text('Created', style: Theme.of(context).textTheme.labelMedium),
             const SizedBox(height: 4),
             Text(formatTodoDate(todo.createdAt)),
           ],
@@ -84,5 +81,3 @@ class TodoDetailScreen extends StatelessWidget {
     );
   }
 }
-
-

@@ -14,12 +14,9 @@ abstract class DatabaseModule {
   Future<Isar> get isar async {
     final directory = await getApplicationDocumentsDirectory();
     return Isar.getInstance() ??
-        await Isar.open(
-          [
-            TodoModelSchema,
-            UserPreferencesModelSchema,
-          ],
-          directory: directory.path,
-        );
+        await Isar.open([
+          TodoModelSchema,
+          UserPreferencesModelSchema,
+        ], directory: directory.path);
   }
 }

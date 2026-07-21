@@ -36,11 +36,7 @@ Future<void> main() async {
     },
     (Object error, StackTrace stack) {
       // TODO: Send to production crash reporter (Sentry, Crashlytics, etc.)
-      log(
-        'Uncaught async error',
-        error: error,
-        stackTrace: stack,
-      );
+      log('Uncaught async error', error: error, stackTrace: stack);
     },
   );
 }

@@ -34,9 +34,7 @@ void main() {
       await tester.pumpWidget(
         BlocProvider.value(
           value: TodoBloc(repository)..add(const WatchTodos()),
-          child: const MaterialApp(
-            home: TodoDetailScreen(todoId: 1),
-          ),
+          child: const MaterialApp(home: TodoDetailScreen(todoId: 1)),
         ),
       );
 

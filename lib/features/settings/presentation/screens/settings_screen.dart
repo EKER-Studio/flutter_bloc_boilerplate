@@ -17,9 +17,9 @@ class SettingsScreen extends StatelessWidget {
           current is SettingsLoadFailure && previous is! SettingsLoadFailure,
       listener: (context, state) {
         if (state is SettingsLoadFailure) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(state.failure.userMessage)),
-          );
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(state.failure.userMessage)));
         }
       },
       child: BlocBuilder<SettingsCubit, SettingsState>(
@@ -27,17 +27,17 @@ class SettingsScreen extends StatelessWidget {
           return switch (state) {
             SettingsInitial() => const SizedBox.shrink(),
             SettingsLoadInProgress() => Scaffold(
-                appBar: AppBar(title: const Text('Settings')),
-                body: const Center(child: CircularProgressIndicator()),
-              ),
-            SettingsLoadSuccess(:final preferences) =>
-              _buildSettings(context, preferences),
+              appBar: AppBar(title: const Text('Settings')),
+              body: const Center(child: CircularProgressIndicator()),
+            ),
+            SettingsLoadSuccess(:final preferences) => _buildSettings(
+              context,
+              preferences,
+            ),
             SettingsLoadFailure(:final failure) => Scaffold(
-                appBar: AppBar(title: const Text('Settings')),
-                body: Center(
-                  child: Text('Error: ${failure.userMessage}'),
-                ),
-              ),
+              appBar: AppBar(title: const Text('Settings')),
+              body: Center(child: Text('Error: ${failure.userMessage}')),
+            ),
           };
         },
       ),
@@ -60,9 +60,7 @@ class SettingsScreen extends StatelessWidget {
             subtitle: const Text('Receive push notifications'),
             value: preferences.isNotificationsEnabled,
             onChanged: (value) {
-              context
-                  .read<SettingsCubit>()
-                  .updateNotificationsEnabled(value);
+              context.read<SettingsCubit>().updateNotificationsEnabled(value);
             },
           ),
         ],
