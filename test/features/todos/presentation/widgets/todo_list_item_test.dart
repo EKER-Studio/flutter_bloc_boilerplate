@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:flutter_riverpod_boilerplate/features/todos/domain/entities/todo.dart';
-import 'package:flutter_riverpod_boilerplate/features/todos/presentation/widgets/todo_list_item.dart';
+import 'package:flutter_bloc_boilerplate/features/todos/domain/entities/todo.dart';
+import 'package:flutter_bloc_boilerplate/features/todos/presentation/widgets/todo_list_item.dart';
 
 void main() {
   final tDate = DateTime(2024, 1, 1, 12, 0);

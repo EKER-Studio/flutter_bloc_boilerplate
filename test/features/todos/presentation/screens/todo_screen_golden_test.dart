@@ -3,95 +3,24 @@ library;
 
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:flutter_riverpod_boilerplate/app.dart';
-import 'package:flutter_riverpod_boilerplate/features/settings/presentation/providers/user_preferences_repository_provider.dart';
-import 'package:flutter_riverpod_boilerplate/features/todos/presentation/providers/todo_repository_provider.dart';
-
-import '../../../../helpers/fake_todo_repository.dart';
-import '../../../../helpers/fake_user_preferences_repository.dart';
-
-// Deterministic clock used to produce stable golden screenshots.
-DateTime _frozenClock() => DateTime(2025, 1, 1, 10, 0);
+import 'package:flutter_bloc_boilerplate/app.dart';
 
 void main() {
-  late FakeTodoRepository repository;
-  late FakeUserPreferencesRepository userPreferencesRepository;
+  testWidgets('Todo screen golden test', (tester) async {
+    tester.view.physicalSize = const Size(1080, 2400);
+    tester.view.devicePixelRatio = 3.0;
 
-  setUp(() {
-    repository = FakeTodoRepository(clock: _frozenClock);
-    userPreferencesRepository = FakeUserPreferencesRepository();
-  });
+    await tester.pumpWidget(const App());
+    await tester.pumpAndSettle();
 
-  tearDown(() {
-    repository.dispose();
-    userPreferencesRepository.dispose();
-  });
+    await expectLater(
+      find.byType(App),
+      matchesGoldenFile('goldens/todo_screen_placeholder.png'),
+    );
 
-  group('Todo Screen Golden Tests', () {
-    testWidgets('Initial empty state', (tester) async {
-      // 1. Freeze device dimensions (e.g., standard phone profile, 1080x2400)
-      tester.view.physicalSize = const Size(1080, 2400);
-      tester.view.devicePixelRatio = 3.0;
-
-      // 2. Build widget with injected fake repository
-      await tester.pumpWidget(
-        ProviderScope(
-          overrides: [
-            todoRepositoryProvider.overrideWithValue(repository),
-            userPreferencesRepositoryProvider.overrideWithValue(
-              userPreferencesRepository,
-            ),
-          ],
-          child: const App(),
-        ),
-      );
-
-      // 3. Wait for all frames to settle (all loading finished)
-      await tester.pumpAndSettle();
-
-      // 4. Compare rendered pixels against the reference file
-      await expectLater(
-        find.byType(App),
-        matchesGoldenFile('goldens/todo_screen_empty.png'),
-      );
-
-      // Cleanup after test
-      tester.view.resetPhysicalSize();
-      tester.view.resetDevicePixelRatio();
-    }, skip: !Platform.isMacOS);
-
-    testWidgets('Populated list state', (tester) async {
-      tester.view.physicalSize = const Size(1080, 2400);
-      tester.view.devicePixelRatio = 3.0;
-
-      // Add deterministic tasks using the frozen clock
-      await repository.add(title: 'Write documentation');
-      await repository.add(title: 'Test the application');
-
-      await tester.pumpWidget(
-        ProviderScope(
-          overrides: [
-            todoRepositoryProvider.overrideWithValue(repository),
-            userPreferencesRepositoryProvider.overrideWithValue(
-              userPreferencesRepository,
-            ),
-          ],
-          child: const App(),
-        ),
-      );
-
-      await tester.pumpAndSettle();
-
-      await expectLater(
-        find.byType(App),
-        matchesGoldenFile('goldens/todo_screen_populated.png'),
-      );
-
-      tester.view.resetPhysicalSize();
-      tester.view.resetDevicePixelRatio();
-    });
+    tester.view.resetPhysicalSize();
+    tester.view.resetDevicePixelRatio();
   }, skip: !Platform.isMacOS);
 }

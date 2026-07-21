@@ -1,16 +1,17 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:get_it/get_it.dart';
+import 'package:injectable/injectable.dart';
 import 'package:isar_community/isar.dart';
 import 'package:path_provider/path_provider.dart';
 
 import 'app.dart';
-import 'core/providers/isar_provider.dart';
+import 'core/di/injection.dart';
 import 'features/settings/data/models/user_preferences_model.dart';
 import 'features/todos/data/models/todo_model.dart';
 
-/// Initializes Isar and launches the app with injected dependencies.
+/// Initializes Isar, configures dependency injection, and launches the app.
 ///
 /// Wrapped in [runZonedGuarded] together with [FlutterError.onError] so that
 /// uncaught errors — both inside and outside the Flutter widget tree — are
@@ -27,6 +28,8 @@ Future<void> main() async {
         debugPrint('Uncaught Flutter error: ${details.exceptionAsString()}');
       };
 
+      configureDependencies(Environment.prod);
+
       final directory = await getApplicationDocumentsDirectory();
       final isar =
           Isar.getInstance() ??
@@ -35,12 +38,9 @@ Future<void> main() async {
             UserPreferencesModelSchema,
           ], directory: directory.path);
 
-      runApp(
-        ProviderScope(
-          overrides: [isarProvider.overrideWithValue(isar)],
-          child: const App(),
-        ),
-      );
+      GetIt.instance.registerSingletonAsync<Isar>(() async => isar);
+
+      runApp(const App());
     },
     (Object error, StackTrace stack) {
       debugPrint('Uncaught async error: $error\n$stack');

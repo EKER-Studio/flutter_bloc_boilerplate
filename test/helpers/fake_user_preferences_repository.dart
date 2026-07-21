@@ -1,8 +1,8 @@
 import 'dart:async';
 
-import 'package:flutter_riverpod_boilerplate/core/errors/failure.dart';
-import 'package:flutter_riverpod_boilerplate/features/settings/domain/entities/user_preferences.dart';
-import 'package:flutter_riverpod_boilerplate/features/settings/domain/repositories/user_preferences_repository.dart';
+import 'package:flutter_bloc_boilerplate/core/errors/failure.dart';
+import 'package:flutter_bloc_boilerplate/features/settings/domain/entities/user_preferences.dart';
+import 'package:flutter_bloc_boilerplate/features/settings/domain/repositories/user_preferences_repository.dart';
 
 /// In-memory implementation of [UserPreferencesRepository] for use in tests.
 ///

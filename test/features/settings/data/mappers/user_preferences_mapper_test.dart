@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:flutter_riverpod_boilerplate/features/settings/data/mappers/user_preferences_mapper.dart';
-import 'package:flutter_riverpod_boilerplate/features/settings/data/models/user_preferences_model.dart';
-import 'package:flutter_riverpod_boilerplate/features/settings/domain/entities/user_preferences.dart';
+import 'package:flutter_bloc_boilerplate/features/settings/data/mappers/user_preferences_mapper.dart';
+import 'package:flutter_bloc_boilerplate/features/settings/data/models/user_preferences_model.dart';
+import 'package:flutter_bloc_boilerplate/features/settings/domain/entities/user_preferences.dart';
 
 void main() {
   group('UserPreferencesMapper', () {

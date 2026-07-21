@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:flutter_riverpod_boilerplate/features/todos/presentation/widgets/add_todo_fab.dart';
+import 'package:flutter_bloc_boilerplate/features/todos/presentation/widgets/add_todo_fab.dart';
 
 void main() {
   testWidgets('AddTodoFab shows dialog and calls onAdd on submit', (

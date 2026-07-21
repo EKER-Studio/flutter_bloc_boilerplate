@@ -61,34 +61,35 @@ For every public class/method, add a doc comment following the language's standa
 
 ---
 
-## Project Stack: flutter_riverpod_boilerplate
+## Project Stack: flutter_bloc_boilerplate
 *(Replace this whole section when starting a new project with a different stack.)*
 
 ### Build & Generation Commands
 - Install dependencies: `flutter pub get`
-- Run build runner: `dart run build_runner build --delete-conflicting-outputs`
-- Watch build runner: `dart run build_runner watch --delete-conflicting-outputs`
+- Run build runner: `dart run build_runner build`
+- Watch build runner: `dart run build_runner watch`
 - Code analysis: `flutter analyze`
 - Run tests: `flutter test`
 
 ### Architecture & Layer Boundaries
 This is a Local-First, AI-Native boilerplate utilizing Clean Architecture under a Feature-First approach, structured as:
-- **Domain Layer** (`lib/features/<feature>/domain/`): Pure Dart logic — entities, repository interfaces, use cases. NO Flutter or Riverpod imports allowed here.
+- **Domain Layer** (`lib/features/<feature>/domain/`): Pure Dart logic — entities, repository interfaces, use cases. NO Flutter, BLoC, or GetIt imports allowed here.
 - **Data Layer** (`lib/features/<feature>/data/`): Repository implementations and local storage handlers utilizing `isar_community`.
-- **Presentation Layer** (`lib/features/<feature>/presentation/`): UI (`ConsumerWidget`) and state management via Riverpod 3.x generators (`@riverpod`).
-- **State Management:** Riverpod 3.x strictly.
-- **Data Flow:** UI (`ConsumerWidget`) -> Notifier (`@riverpod`) -> Repository Interface (domain) -> Repository Impl (data) -> Local DB (`isar_community`).
-- **Reactivity:** Handled purely via Isar streams. Notifiers listen to Isar collections and pipe data directly into `AsyncValue` state.
+- **Presentation Layer** (`lib/features/<feature>/presentation/`): UI (`StatelessWidget`/`StatefulWidget`) and state management via BLoC (`flutter_bloc`).
+- **DI:** GetIt + Injectable for dependency injection. All services/repositories are registered via `@injectable`/`@singleton` annotations.
+- **State Management:** BLoC (flutter_bloc) strictly.
+- **Data Flow:** UI (`BlocBuilder`/`BlocListener`) -> BLoC (`Bloc`) -> Repository Interface (domain) -> Repository Impl (data) -> Local DB (`isar_community`).
+- **Reactivity:** Handled purely via Isar streams. BLoCs listen to Isar collections and emit states accordingly.
 
 ### Lifecycle & Resource Disposal Checklist
 Before considering any feature involving streams, timers, or animations complete, verify:
-- Every `StreamSubscription` is cancelled in `dispose()` or the corresponding Notifier's `ref.onDispose()`.
-- Every `Timer` or `AnimationController` is cancelled/disposed the same way to prevent memory leaks.
-- All Isar dynamic query streams are properly closed or managed via Riverpod's auto-dispose mechanism.
+- Every `StreamSubscription` is cancelled in `close()` or the corresponding BLoC's `onClose`.
+- Every `Timer` or `AnimationController` is properly disposed.
+- All Isar dynamic query streams are properly closed or managed via BLoC lifecycle.
 
 ### Mandatory Verification Pipeline
 After any modification within the `lib/**` directory, you MUST execute the following pipeline in strict order:
-1. `dart run build_runner build --delete-conflicting-outputs`
+1. `dart run build_runner build`
 2. `flutter analyze`
 3. `flutter test`
 
