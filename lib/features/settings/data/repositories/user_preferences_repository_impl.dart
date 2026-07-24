@@ -71,13 +71,14 @@ class UserPreferencesRepositoryImpl implements UserPreferencesRepository {
           error: e,
           stackTrace: s,
         );
+        if (attempt >= maxRetries) {
+          throw DatabaseFailure(
+            'Isar watch stream "$label" failed after $maxRetries attempts',
+          );
+        }
         await Future<void>.delayed(delay);
       }
     }
-    log(
-      'Isar watch stream "$label" — all $maxRetries attempts exhausted, '
-      'giving up',
-    );
   }
 
   @override

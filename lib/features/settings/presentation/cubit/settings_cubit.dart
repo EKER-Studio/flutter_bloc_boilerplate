@@ -17,6 +17,10 @@ class SettingsCubit extends Cubit<SettingsState> {
   /// [SettingsInitial] state.
   SettingsCubit(this._repository, this._appThemeCubit)
     : super(const SettingsInitial()) {
+    _startListening();
+  }
+
+  void _startListening() {
     _prefsSubscription = _repository.watch().listen(
       (prefs) {
         final shouldEmit =

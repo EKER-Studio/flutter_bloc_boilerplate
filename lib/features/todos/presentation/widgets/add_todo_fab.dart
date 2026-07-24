@@ -48,9 +48,9 @@ class _AddTodoDialogState extends State<_AddTodoDialog> {
 
   void _submit() {
     if (!mounted) return;
-    if (_formKey.currentState?.validate() ?? false) {
-      Navigator.of(context).pop(_controller.text);
-    }
+    if (!(_formKey.currentState?.validate() ?? false)) return;
+    if (!mounted) return;
+    Navigator.of(context).pop(_controller.text);
   }
 
   @override

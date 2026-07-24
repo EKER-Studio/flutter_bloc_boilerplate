@@ -15,7 +15,7 @@ abstract class DatabaseModule {
     final directory = await getApplicationDocumentsDirectory();
     final existing = Isar.getInstance();
     if (existing != null && existing.isOpen) {
-      return existing;
+      return existing!;
     }
     return await Isar.open([
       TodoModelSchema,
