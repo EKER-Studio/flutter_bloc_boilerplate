@@ -19,8 +19,12 @@ class SettingsCubit extends Cubit<SettingsState> {
     : super(const SettingsInitial()) {
     _prefsSubscription = _repository.watch().listen(
       (prefs) {
+        final shouldEmit =
+            _lastKnownPreferences == null || _lastKnownPreferences != prefs;
         _lastKnownPreferences = prefs;
-        emit(SettingsLoadSuccess(prefs));
+        if (shouldEmit) {
+          emit(SettingsLoadSuccess(prefs));
+        }
       },
       onError: (Object error) {
         if (_lastKnownPreferences != null) {
@@ -52,12 +56,18 @@ class SettingsCubit extends Cubit<SettingsState> {
     }
   }
 
-  /// Persists the notifications toggle. Reverts to the last known preferences
-  /// on failure so the UI does not get stuck in an error state.
+  /// Persists the notifications toggle and immediately emits the updated
+  /// preference, avoiding reliance on the Isar watch stream alone. Reverts to
+  /// the last known preferences on failure.
   Future<void> updateNotificationsEnabled(bool enabled) async {
     final snapshot = _lastKnownPreferences;
     final result = await _repository.updateNotificationsEnabled(enabled);
-    if (result.$2 != null) {
+    if (result.$1) {
+      final updatedPreferences = (snapshot ?? UserPreferences.defaults())
+          .copyWith(isNotificationsEnabled: enabled);
+      _lastKnownPreferences = updatedPreferences;
+      emit(SettingsLoadSuccess(updatedPreferences));
+    } else if (result.$2 != null) {
       if (snapshot != null) {
         emit(SettingsLoadSuccess(snapshot));
       } else {

@@ -69,6 +69,29 @@ class _ErrorStreamRepository implements UserPreferencesRepository {
   }
 }
 
+/// A repository that never emits a watch snapshot before a write succeeds.
+class _SilentRepository implements UserPreferencesRepository {
+  @override
+  Stream<UserPreferences> watch() => const Stream.empty();
+
+  @override
+  Future<UserPreferences> get() async => UserPreferences.defaults();
+
+  @override
+  Future<(bool success, Failure? failure)> updateThemeMode(
+    UserThemeMode mode,
+  ) async {
+    return (true, null);
+  }
+
+  @override
+  Future<(bool success, Failure? failure)> updateNotificationsEnabled(
+    bool isEnabled,
+  ) async {
+    return (true, null);
+  }
+}
+
 /// In-memory [Storage] for use in tests so [AppThemeCubit] (a [HydratedCubit])
 /// can be instantiated without real file-system or web storage.
 class _TestStorage implements Storage {
@@ -138,6 +161,22 @@ void main() {
         await cubit.updateNotificationsEnabled(false);
       },
       wait: const Duration(milliseconds: 50),
+      expect: () => [
+        isA<SettingsLoadSuccess>(),
+        isA<SettingsLoadSuccess>().having(
+          (s) => s.preferences.isNotificationsEnabled,
+          'isNotificationsEnabled',
+          false,
+        ),
+      ],
+    );
+
+    blocTest<SettingsCubit, SettingsState>(
+      'updateNotificationsEnabled: emits success without prior watch snapshot',
+      build: () => SettingsCubit(_SilentRepository(), AppThemeCubit()),
+      act: (cubit) async {
+        await cubit.updateNotificationsEnabled(false);
+      },
       expect: () => [
         isA<SettingsLoadSuccess>().having(
           (s) => s.preferences.isNotificationsEnabled,
