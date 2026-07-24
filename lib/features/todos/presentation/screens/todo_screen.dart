@@ -121,7 +121,7 @@ class TodoScreen extends StatelessWidget {
                   onToggle: () =>
                       context.read<TodoBloc>().add(TodoToggled(todo.id)),
                   onDelete: () =>
-                      context.read<TodoBloc>().add(TodoDeleted(todo.id)),
+                      context.read<TodoBloc>().add(TodoDeleted(todo)),
                 );
               },
             ),

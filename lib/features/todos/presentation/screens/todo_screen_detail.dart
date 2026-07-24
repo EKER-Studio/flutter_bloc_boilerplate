@@ -56,7 +56,7 @@ class TodoDetailScreen extends StatelessWidget {
             tooltip: 'Delete',
             icon: const Icon(Icons.delete_outline),
             onPressed: () {
-              context.read<TodoBloc>().add(TodoDeleted(todo.id));
+              context.read<TodoBloc>().add(TodoDeleted(todo));
             },
           ),
         ],

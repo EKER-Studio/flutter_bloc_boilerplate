@@ -29,13 +29,15 @@ class TodoToggled extends TodoEvent {
   final int id;
 }
 
-/// Deletes the todo identified by [id].
+/// Deletes a todo. Carries the full [todo] entity so the handler does not need
+/// to look it up from [TodoState], avoiding race conditions when Isar updates
+/// the state asynchronously.
 class TodoDeleted extends TodoEvent {
-  /// Creates a [TodoDeleted] event for the todo with [id].
-  const TodoDeleted(this.id);
+  /// Creates a [TodoDeleted] event for the given [todo].
+  const TodoDeleted(this.todo);
 
-  /// The id of the todo to delete.
-  final int id;
+  /// The todo to delete. Used for undo recovery.
+  final Todo todo;
 }
 
 /// Restores the most recently deleted todo.

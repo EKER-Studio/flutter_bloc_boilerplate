@@ -79,23 +79,15 @@ class TodoBloc extends Bloc<TodoEvent, TodoState> {
     TodoDeleted event,
     Emitter<TodoState> emit,
   ) async {
+    _undoQueue.addLast(event.todo);
     try {
-      final currentState = state;
-      if (currentState is TodoLoadSuccess) {
-        final todo = currentState.todos
-            .where((t) => t.id == event.id)
-            .firstOrNull;
-        if (todo != null) {
-          _undoQueue.addLast(todo);
-        }
-      }
-      final result = await _repository.delete(id: event.id);
+      final result = await _repository.delete(id: event.todo.id);
       if (result.$2 != null) {
-        if (_undoQueue.isNotEmpty) _undoQueue.removeLast();
+        _undoQueue.removeLast();
         emit(TodoLoadFailure(result.$2!));
       }
     } catch (e) {
-      if (_undoQueue.isNotEmpty) _undoQueue.removeLast();
+      _undoQueue.removeLast();
       emit(TodoLoadFailure(DatabaseFailure('Delete failed: ${e.toString()}')));
     }
   }
@@ -106,10 +98,11 @@ class TodoBloc extends Bloc<TodoEvent, TodoState> {
   ) async {
     if (_undoQueue.isEmpty) return;
     try {
-      final todo = _undoQueue.removeLast();
+      final todo = _undoQueue.last;
       final result = await _repository.restore(todo);
-      if (result.$2 != null) {
-        _undoQueue.addLast(todo);
+      if (result.$1) {
+        _undoQueue.removeLast();
+      } else {
         emit(TodoLoadFailure(result.$2!));
       }
     } catch (e) {

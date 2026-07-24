@@ -174,7 +174,7 @@ void main() {
         act: (bloc) async {
           bloc.add(const WatchTodos());
           await Future<void>.delayed(Duration.zero);
-          bloc.add(const TodoDeleted(1));
+          bloc.add(TodoDeleted(_created));
         },
         expect: () => [
           const TodoLoadInProgress(),
@@ -196,9 +196,9 @@ void main() {
         act: (bloc) async {
           bloc.add(const WatchTodos());
           await Future<void>.delayed(Duration.zero);
-          bloc.add(const TodoDeleted(2));
+          bloc.add(TodoDeleted(_second));
           await Future<void>.delayed(Duration.zero);
-          bloc.add(const TodoDeleted(1));
+          bloc.add(TodoDeleted(_created));
         },
         expect: () => [
           const TodoLoadInProgress(),
@@ -228,7 +228,7 @@ void main() {
         act: (bloc) async {
           bloc.add(const WatchTodos());
           await Future<void>.delayed(Duration.zero);
-          bloc.add(const TodoDeleted(1));
+          bloc.add(TodoDeleted(_created));
         },
         expect: () => [
           const TodoLoadInProgress(),
@@ -252,7 +252,7 @@ void main() {
         act: (bloc) async {
           bloc.add(const WatchTodos());
           await Future<void>.delayed(Duration.zero);
-          bloc.add(const TodoDeleted(1));
+          bloc.add(TodoDeleted(_created));
           await Future<void>.delayed(Duration.zero);
           bloc.add(const TodoRestored());
         },
