@@ -6,7 +6,9 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:hydrated_bloc/hydrated_bloc.dart';
 
+import 'package:flutter_bloc_boilerplate/core/presentation/cubit/app_theme_cubit.dart';
 import 'package:flutter_bloc_boilerplate/features/settings/presentation/cubit/settings_cubit.dart';
 import 'package:flutter_bloc_boilerplate/features/todos/presentation/bloc/todo_bloc.dart';
 import 'package:flutter_bloc_boilerplate/features/todos/presentation/bloc/todo_event.dart';
@@ -15,8 +17,36 @@ import 'package:flutter_bloc_boilerplate/features/todos/presentation/screens/tod
 import '../../../../helpers/fake_todo_repository.dart';
 import '../../../../helpers/fake_user_preferences_repository.dart';
 
+/// In-memory [Storage] for use in tests so [AppThemeCubit] (a [HydratedCubit])
+/// can be instantiated without real file-system or web storage.
+class _TestStorage implements Storage {
+  final _store = <String, dynamic>{};
+
+  @override
+  dynamic read(String key) => _store[key];
+
+  @override
+  Future<void> write(String key, dynamic value) async {
+    _store[key] = value;
+  }
+
+  @override
+  Future<void> delete(String key) async {
+    _store.remove(key);
+  }
+
+  @override
+  Future<void> clear() async {
+    _store.clear();
+  }
+
+  @override
+  Future<void> close() async {}
+}
+
 void main() {
   testWidgets('Todo screen golden test', (tester) async {
+    HydratedBloc.storage = _TestStorage();
     tester.view.physicalSize = const Size(1080, 2400);
     tester.view.devicePixelRatio = 3.0;
 
@@ -28,7 +58,10 @@ void main() {
                 TodoBloc(FakeTodoRepository())..add(const WatchTodos()),
           ),
           BlocProvider<SettingsCubit>(
-            create: (_) => SettingsCubit(FakeUserPreferencesRepository()),
+            create: (_) => SettingsCubit(
+              FakeUserPreferencesRepository(),
+              AppThemeCubit(),
+            ),
           ),
         ],
         child: MaterialApp(

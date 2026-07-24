@@ -2,7 +2,9 @@ import 'dart:async';
 
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:hydrated_bloc/hydrated_bloc.dart';
 import 'package:flutter_bloc_boilerplate/core/errors/failure.dart';
+import 'package:flutter_bloc_boilerplate/core/presentation/cubit/app_theme_cubit.dart';
 import 'package:flutter_bloc_boilerplate/features/settings/domain/entities/user_preferences.dart';
 import 'package:flutter_bloc_boilerplate/features/settings/domain/repositories/user_preferences_repository.dart';
 import 'package:flutter_bloc_boilerplate/features/settings/presentation/cubit/settings_cubit.dart';
@@ -67,10 +69,38 @@ class _ErrorStreamRepository implements UserPreferencesRepository {
   }
 }
 
+/// In-memory [Storage] for use in tests so [AppThemeCubit] (a [HydratedCubit])
+/// can be instantiated without real file-system or web storage.
+class _TestStorage implements Storage {
+  final _store = <String, dynamic>{};
+
+  @override
+  dynamic read(String key) => _store[key];
+
+  @override
+  Future<void> write(String key, dynamic value) async {
+    _store[key] = value;
+  }
+
+  @override
+  Future<void> delete(String key) async {
+    _store.remove(key);
+  }
+
+  @override
+  Future<void> clear() async {
+    _store.clear();
+  }
+
+  @override
+  Future<void> close() async {}
+}
+
 void main() {
   late FakeUserPreferencesRepository repository;
 
   setUp(() {
+    HydratedBloc.storage = _TestStorage();
     repository = FakeUserPreferencesRepository();
   });
 
@@ -80,12 +110,15 @@ void main() {
 
   group('SettingsCubit', () {
     test('initial state is SettingsInitial', () {
-      expect(SettingsCubit(repository).state, const SettingsInitial());
+      expect(
+        SettingsCubit(repository, AppThemeCubit()).state,
+        const SettingsInitial(),
+      );
     });
 
     blocTest<SettingsCubit, SettingsState>(
       'init() emits LoadInProgress then LoadSuccess with defaults',
-      build: () => SettingsCubit(repository),
+      build: () => SettingsCubit(repository, AppThemeCubit()),
       act: (cubit) => cubit.init(),
       expect: () => [
         const SettingsLoadInProgress(),
@@ -96,7 +129,7 @@ void main() {
     blocTest<SettingsCubit, SettingsState>(
       'updateThemeMode: watch stream emits updated theme',
       build: () {
-        final cubit = SettingsCubit(repository);
+        final cubit = SettingsCubit(repository, AppThemeCubit());
         cubit.init();
         return cubit;
       },
@@ -123,7 +156,7 @@ void main() {
     blocTest<SettingsCubit, SettingsState>(
       'updateNotificationsEnabled: watch stream emits updated preference',
       build: () {
-        final cubit = SettingsCubit(repository);
+        final cubit = SettingsCubit(repository, AppThemeCubit());
         cubit.init();
         return cubit;
       },
@@ -153,7 +186,7 @@ void main() {
           repository,
           const DatabaseFailure('write error'),
         );
-        final cubit = SettingsCubit(failingRepo);
+        final cubit = SettingsCubit(failingRepo, AppThemeCubit());
         cubit.init();
         return cubit;
       },
@@ -179,7 +212,7 @@ void main() {
 
     blocTest<SettingsCubit, SettingsState>(
       'watch stream error without snapshot emits SettingsLoadFailure',
-      build: () => SettingsCubit(_ErrorStreamRepository()),
+      build: () => SettingsCubit(_ErrorStreamRepository(), AppThemeCubit()),
       act: (cubit) => cubit.init(),
       expect: () => [
         const SettingsLoadInProgress(),
@@ -189,7 +222,7 @@ void main() {
 
     blocTest<SettingsCubit, SettingsState>(
       'close() cancels subscription and does not emit after',
-      build: () => SettingsCubit(repository),
+      build: () => SettingsCubit(repository, AppThemeCubit()),
       act: (cubit) async {
         cubit.init();
         await Future<void>.delayed(Duration.zero);

@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import 'package:flutter_bloc_boilerplate/core/presentation/cubit/app_theme_cubit.dart';
-
 import '../../../../core/errors/failure.dart';
 import '../../domain/entities/user_preferences.dart';
 import '../cubit/settings_cubit.dart';
@@ -79,7 +77,6 @@ class SettingsScreen extends StatelessWidget {
         onChanged: (value) {
           if (value != null) {
             context.read<SettingsCubit>().updateThemeMode(value);
-            context.read<AppThemeCubit>().setThemeMode(value);
             Navigator.of(dialogContext).pop();
           }
         },

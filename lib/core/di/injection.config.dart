@@ -56,7 +56,10 @@ extension GetItInjectableX on _i174.GetIt {
       () => _i888.TodoRepositoryImpl(gh<_i214.Isar>()),
     );
     gh.factory<_i792.SettingsCubit>(
-      () => _i792.SettingsCubit(gh<_i1060.UserPreferencesRepository>()),
+      () => _i792.SettingsCubit(
+        gh<_i1060.UserPreferencesRepository>(),
+        gh<_i622.AppThemeCubit>(),
+      ),
     );
     gh.lazySingleton<_i361.Dio>(
       () => networkModule.dioProd,
