@@ -42,7 +42,7 @@ void main() {
     final cubit = SettingsCubit(
       FakeUserPreferencesRepository(),
       AppThemeCubit(),
-    )..init();
+    );
 
     await tester.pumpWidget(
       BlocProvider.value(

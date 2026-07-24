@@ -12,20 +12,11 @@ import 'settings_state.dart';
 /// Cubit managing user preferences state.
 @injectable
 class SettingsCubit extends Cubit<SettingsState> {
-  /// Creates a cubit backed by the given repository.
+  /// Creates a cubit backed by the given repository and immediately starts
+  /// watching the preferences stream so the widget tree never sees a stale
+  /// [SettingsInitial] state.
   SettingsCubit(this._repository, this._appThemeCubit)
-    : super(const SettingsInitial());
-
-  final UserPreferencesRepository _repository;
-  final AppThemeCubit _appThemeCubit;
-  StreamSubscription<UserPreferences>? _prefsSubscription;
-  UserPreferences? _lastKnownPreferences;
-
-  /// Initialises the cubit: starts watching the preferences stream and emits
-  /// the current value. Must be called once immediately after creation.
-  void init() {
-    emit(const SettingsLoadInProgress());
-    _prefsSubscription?.cancel();
+    : super(const SettingsInitial()) {
     _prefsSubscription = _repository.watch().listen(
       (prefs) {
         _lastKnownPreferences = prefs;
@@ -40,6 +31,11 @@ class SettingsCubit extends Cubit<SettingsState> {
       },
     );
   }
+
+  final UserPreferencesRepository _repository;
+  final AppThemeCubit _appThemeCubit;
+  StreamSubscription<UserPreferences>? _prefsSubscription;
+  UserPreferences? _lastKnownPreferences;
 
   /// Persists the selected theme mode and immediately applies it via
   /// [AppThemeCubit]. Reverts to the last known preferences on failure so

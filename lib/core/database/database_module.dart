@@ -13,10 +13,13 @@ abstract class DatabaseModule {
   @singleton
   Future<Isar> get isar async {
     final directory = await getApplicationDocumentsDirectory();
-    return Isar.getInstance() ??
-        await Isar.open([
-          TodoModelSchema,
-          UserPreferencesModelSchema,
-        ], directory: directory.path);
+    final existing = Isar.getInstance();
+    if (existing != null && existing.isOpen) {
+      return existing;
+    }
+    return await Isar.open([
+      TodoModelSchema,
+      UserPreferencesModelSchema,
+    ], directory: directory.path);
   }
 }

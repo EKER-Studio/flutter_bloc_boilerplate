@@ -48,23 +48,36 @@ class UserPreferencesRepositoryImpl implements UserPreferencesRepository {
 
   /// Wraps an Isar watch stream in an auto-reconnecting loop so transient
   /// database errors don't permanently terminate the subscription.
+  ///
+  /// Retries up to [maxRetries] times with exponential back-off (1s, 2s, 4s,
+  /// ...) capped at 30 seconds to avoid resource exhaustion on terminal
+  /// failures.
   Stream<T> _watchWithReconnect<T>(
     Stream<T> Function() createStream,
-    String label,
-  ) async* {
-    while (true) {
+    String label, {
+    int maxRetries = 5,
+  }) async* {
+    var attempt = 0;
+    while (attempt < maxRetries) {
       try {
         yield* createStream();
         return;
       } catch (e, s) {
+        attempt++;
+        final delay = Duration(seconds: (1 << (attempt - 1)).clamp(0, 30));
         log(
-          'Isar watch stream "$label" error, reconnecting in 1s',
+          'Isar watch stream "$label" error (attempt $attempt/$maxRetries), '
+          'reconnecting in ${delay.inSeconds}s',
           error: e,
           stackTrace: s,
         );
-        await Future<void>.delayed(const Duration(seconds: 1));
+        await Future<void>.delayed(delay);
       }
     }
+    log(
+      'Isar watch stream "$label" — all $maxRetries attempts exhausted, '
+      'giving up',
+    );
   }
 
   @override
