@@ -1,16 +1,19 @@
-/// Application-wide theme mode persisted via hydrated_bloc.
-enum AppThemeMode { light, dark, system }
+import 'package:flutter_bloc_boilerplate/features/settings/domain/entities/user_preferences.dart';
 
 /// Serializable state for [AppThemeCubit].
 class AppThemeState {
   const AppThemeState(this.mode);
 
-  const AppThemeState.system() : mode = AppThemeMode.system;
+  const AppThemeState.system() : mode = UserThemeMode.system;
 
-  final AppThemeMode mode;
+  final UserThemeMode mode;
 
   factory AppThemeState.fromJson(Map<String, dynamic> json) {
-    return AppThemeState(AppThemeMode.values[json['mode'] as int]);
+    final index = json['mode'];
+    if (index is int && index >= 0 && index < UserThemeMode.values.length) {
+      return AppThemeState(UserThemeMode.values[index]);
+    }
+    return const AppThemeState.system();
   }
 
   Map<String, dynamic> toJson() => {'mode': mode.index};

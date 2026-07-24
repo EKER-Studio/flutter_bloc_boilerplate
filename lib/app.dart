@@ -4,6 +4,7 @@ import 'package:get_it/get_it.dart';
 
 import 'core/presentation/cubit/app_theme_cubit.dart';
 import 'core/presentation/cubit/app_theme_state.dart';
+import 'features/settings/domain/entities/user_preferences.dart';
 import 'features/settings/presentation/cubit/settings_cubit.dart';
 import 'features/todos/presentation/bloc/todo_bloc.dart';
 import 'features/todos/presentation/bloc/todo_event.dart';
@@ -62,10 +63,10 @@ class _AppView extends StatelessWidget {
   }
 }
 
-ThemeMode _mapThemeMode(AppThemeMode mode) {
+ThemeMode _mapThemeMode(UserThemeMode mode) {
   return switch (mode) {
-    AppThemeMode.light => ThemeMode.light,
-    AppThemeMode.dark => ThemeMode.dark,
-    AppThemeMode.system => ThemeMode.system,
+    UserThemeMode.light => ThemeMode.light,
+    UserThemeMode.dark => ThemeMode.dark,
+    UserThemeMode.system => ThemeMode.system,
   };
 }
