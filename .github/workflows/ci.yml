@@ -24,7 +24,23 @@ jobs:
         uses: subosito/flutter-action@v2
         with:
           channel: 'stable'
-          cache: true # Built-in cache mechanism inside flutter-action (faster and more stable)
+          cache: true
+
+      - name: Cache Pub dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.pub-cache
+          key: pub-cache-${{ runner.os }}-${{ hashFiles('pubspec.lock') }}
+          restore-keys: |
+            pub-cache-${{ runner.os }}-
+
+      - name: Cache Build Runner / native artifacts
+        uses: actions/cache@v4
+        with:
+          path: .dart_tool
+          key: dart-tool-${{ runner.os }}-${{ hashFiles('pubspec.lock') }}
+          restore-keys: |
+            dart-tool-${{ runner.os }}-
 
       - name: Install dependencies
         run: flutter pub get
@@ -42,4 +58,4 @@ jobs:
         run: flutter analyze
 
       - name: Run unit and widget tests
-        run: flutter test --exclude-tags golden
+        run: flutter test -j 1
