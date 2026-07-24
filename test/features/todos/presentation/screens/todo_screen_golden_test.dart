@@ -45,7 +45,7 @@ class _TestStorage implements Storage {
 }
 
 void main() {
-  testWidgets('Todo screen golden test', (tester) async {
+  testWidgets('TodoListItem Golden Tests', (tester) async {
     HydratedBloc.storage = _TestStorage();
     tester.view.physicalSize = const Size(1080, 2400);
     tester.view.devicePixelRatio = 3.0;

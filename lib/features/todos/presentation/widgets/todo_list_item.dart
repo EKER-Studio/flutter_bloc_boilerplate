@@ -56,15 +56,18 @@ class TodoListItem extends StatelessWidget {
             onChanged: (_) => onToggle(),
           ),
         ),
-        title: Text(
-          todo.title,
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-          style: TextStyle(
-            decoration: todo.isCompleted ? TextDecoration.lineThrough : null,
-            color: todo.isCompleted
-                ? Theme.of(context).colorScheme.onSurfaceVariant
-                : null,
+        title: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: double.infinity),
+          child: Text(
+            todo.title,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              decoration: todo.isCompleted ? TextDecoration.lineThrough : null,
+              color: todo.isCompleted
+                  ? Theme.of(context).colorScheme.onSurfaceVariant
+                  : null,
+            ),
           ),
         ),
         subtitle: Text(
