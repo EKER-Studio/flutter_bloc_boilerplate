@@ -11,7 +11,7 @@ import 'package:flutter_bloc_boilerplate/features/todos/presentation/widgets/tod
 void main() {
   final frozenDate = DateTime(2025, 1, 1, 10, 0);
 
-  group('TodoListItem Golden Tesfluttets', () {
+  group('TodoListItem Golden Tests', () {
     testWidgets('Active state', (tester) async {
       tester.view.physicalSize = const Size(500, 100);
       tester.view.devicePixelRatio = 3.0;

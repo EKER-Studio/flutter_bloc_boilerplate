@@ -90,12 +90,17 @@ final _second = Todo(
 void main() {
   group('TodoBloc', () {
     late FakeTodoRepository repository;
+    final repos = <FakeTodoRepository>[];
 
     setUp(() {
       repository = FakeTodoRepository();
+      repos.clear();
     });
 
     tearDown(() {
+      for (final r in repos) {
+        r.dispose();
+      }
       repository.dispose();
     });
 
@@ -141,6 +146,7 @@ void main() {
         'toggles the completed state of a todo',
         build: () {
           final repo = FakeTodoRepository(initialTodos: [_created]);
+          repos.add(repo);
           return TodoBloc(repo);
         },
         act: (bloc) async {
@@ -169,6 +175,7 @@ void main() {
         'deletes a todo and tracks it for undo',
         build: () {
           final repo = FakeTodoRepository(initialTodos: [_created]);
+          repos.add(repo);
           return TodoBloc(repo);
         },
         act: (bloc) async {
@@ -191,6 +198,7 @@ void main() {
         'rapid consecutive deletes: queue preserves each deleted todo',
         build: () {
           final repo = FakeTodoRepository(initialTodos: [_created, _second]);
+          repos.add(repo);
           return TodoBloc(repo);
         },
         act: (bloc) async {
@@ -219,11 +227,9 @@ void main() {
       blocTest<TodoBloc, TodoState>(
         'delete failure emits TodoLoadFailure and handles empty queue',
         build: () {
-          final failingRepo = _FailingOnceTodoRepository(
-            FakeTodoRepository(initialTodos: [_created]),
-            'delete',
-          );
-          return TodoBloc(failingRepo);
+          final fakeRepo = FakeTodoRepository(initialTodos: [_created]);
+          repos.add(fakeRepo);
+          return TodoBloc(_FailingOnceTodoRepository(fakeRepo, 'delete'));
         },
         act: (bloc) async {
           bloc.add(const WatchTodos());
@@ -247,6 +253,7 @@ void main() {
         'restores the most recently deleted todo',
         build: () {
           final repo = FakeTodoRepository(initialTodos: [_created]);
+          repos.add(repo);
           return TodoBloc(repo);
         },
         act: (bloc) async {
@@ -290,11 +297,9 @@ void main() {
       blocTest<TodoBloc, TodoState>(
         'add failure emits TodoLoadFailure',
         build: () {
-          final failingRepo = _FailingOnceTodoRepository(
-            FakeTodoRepository(),
-            'add',
-          );
-          return TodoBloc(failingRepo);
+          final fakeRepo = FakeTodoRepository();
+          repos.add(fakeRepo);
+          return TodoBloc(_FailingOnceTodoRepository(fakeRepo, 'add'));
         },
         act: (bloc) async {
           bloc.add(const WatchTodos());
@@ -315,11 +320,9 @@ void main() {
       blocTest<TodoBloc, TodoState>(
         'toggle failure emits TodoLoadFailure',
         build: () {
-          final failingRepo = _FailingOnceTodoRepository(
-            FakeTodoRepository(initialTodos: [_created]),
-            'toggle',
-          );
-          return TodoBloc(failingRepo);
+          final fakeRepo = FakeTodoRepository(initialTodos: [_created]);
+          repos.add(fakeRepo);
+          return TodoBloc(_FailingOnceTodoRepository(fakeRepo, 'toggle'));
         },
         act: (bloc) async {
           bloc.add(const WatchTodos());

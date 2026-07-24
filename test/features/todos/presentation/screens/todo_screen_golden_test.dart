@@ -53,6 +53,7 @@ void main() {
     await tester.pumpWidget(
       MultiBlocProvider(
         providers: [
+          BlocProvider<AppThemeCubit>(create: (_) => AppThemeCubit()),
           BlocProvider<TodoBloc>(
             create: (_) =>
                 TodoBloc(FakeTodoRepository())..add(const WatchTodos()),

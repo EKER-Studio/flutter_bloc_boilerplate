@@ -58,6 +58,8 @@ class TodoListItem extends StatelessWidget {
         ),
         title: Text(
           todo.title,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
           style: TextStyle(
             decoration: todo.isCompleted ? TextDecoration.lineThrough : null,
             color: todo.isCompleted
