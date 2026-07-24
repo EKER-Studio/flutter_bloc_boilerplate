@@ -11,8 +11,9 @@ class UserPreferencesModel {
   /// The singleton ID for user preferences.
   Id id = userPreferencesSingletonId;
 
-  /// The selected theme mode as a string.
-  late String themeMode;
+  /// The selected theme mode as a string. Defaults to `'system'` so that
+  /// newly created / migrated rows always have a valid value.
+  String themeMode = 'system';
 
   /// Whether notifications are enabled.
   bool isNotificationsEnabled = true;

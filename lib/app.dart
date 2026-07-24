@@ -9,6 +9,7 @@ import 'features/settings/presentation/cubit/settings_cubit.dart';
 import 'features/todos/presentation/bloc/todo_bloc.dart';
 import 'features/todos/presentation/bloc/todo_event.dart';
 import 'features/todos/presentation/screens/todo_screen.dart';
+import 'l10n/app_localizations.dart';
 
 /// Root widget that configures BLoCs, applies theme preferences, and hosts the
 /// home screen.
@@ -44,6 +45,8 @@ class _AppView extends StatelessWidget {
       builder: (context, state) {
         return MaterialApp(
           title: 'Flutter BLoC Boilerplate',
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
           theme: ThemeData(
             colorScheme: ColorScheme.fromSeed(seedColor: Colors.indigo),
             useMaterial3: true,
