@@ -1,9 +1,5 @@
 /// Application-wide theme mode persisted via hydrated_bloc.
-enum AppThemeMode {
-  light,
-  dark,
-  system,
-}
+enum AppThemeMode { light, dark, system }
 
 /// Serializable state for [AppThemeCubit].
 class AppThemeState {
@@ -21,8 +17,7 @@ class AppThemeState {
 
   @override
   bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is AppThemeState && other.mode == mode;
+      identical(this, other) || other is AppThemeState && other.mode == mode;
 
   @override
   int get hashCode => mode.hashCode;
