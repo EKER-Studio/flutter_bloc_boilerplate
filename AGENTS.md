@@ -66,31 +66,47 @@ For every public class/method, add a doc comment following the language's standa
 
 ### Build & Generation Commands
 - Install dependencies: `flutter pub get`
-- Run build runner: `dart run build_runner build`
-- Watch build runner: `dart run build_runner watch`
+- Run build runner: `dart run build_runner build --delete-conflicting-outputs`
+- Watch build runner: `dart run build_runner watch --delete-conflicting-outputs`
 - Code analysis: `flutter analyze`
 - Run tests: `flutter test`
+- Use `--delete-conflicting-outputs` on build_runner to prevent compilation deadlocks from stale generated files.
 
 ### Architecture & Layer Boundaries
-This is a Local-First, AI-Native boilerplate utilizing Clean Architecture under a Feature-First approach, structured as:
+This is a Local-First, AI-Native boilerplate utilizing Clean Architecture under a Feature-First approach:
 - **Domain Layer** (`lib/features/<feature>/domain/`): Pure Dart logic — entities, repository interfaces, use cases. NO Flutter, BLoC, or GetIt imports allowed here.
-- **Data Layer** (`lib/features/<feature>/data/`): Repository implementations and local storage handlers utilizing `isar_community`.
-- **Presentation Layer** (`lib/features/<feature>/presentation/`): UI (`StatelessWidget`/`StatefulWidget`) and state management via BLoC (`flutter_bloc`).
-- **DI:** GetIt + Injectable for dependency injection. All services/repositories are registered via `@injectable`/`@singleton` annotations.
-- **State Management:** BLoC (flutter_bloc) strictly.
+- **Data Layer** (`lib/features/<feature>/data/`): Repository implementations, Isar models, mappers, utilizing `isar_community`.
+- **Presentation Layer** (`lib/features/<feature>/presentation/`): UI widgets, BLoC/Cubit state management.
+- **DI:** GetIt + Injectable (`@injectable`/`@lazySingleton`) for dependency injection. Regenerate after adding/changing annotations via the build runner command above.
+- **State Management:** BLoC (`flutter_bloc`) strictly.
 - **Data Flow:** UI (`BlocBuilder`/`BlocListener`) -> BLoC (`Bloc`) -> Repository Interface (domain) -> Repository Impl (data) -> Local DB (`isar_community`).
 - **Reactivity:** Handled purely via Isar streams. BLoCs listen to Isar collections and emit states accordingly.
+- **Custom Lint Rule:** `avoid_infrastructure_imports_in_presentation` — the presentation layer must not import data-layer files.
+- **Entrypoints:** `lib/main.dart` (DI init + `runApp`) -> `lib/app.dart` (`MultiBlocProvider` + `MaterialApp`). DI is configured via `configureDependencies(Environment.prod)` in `main.dart`.
+
+### Generated Files
+- `*.g.dart` files hold Injectable DI config and Isar schemas, use the `part of` directive, and are excluded from `flutter analyze`.
+- Regenerate whenever annotations change (see Build & Generation Commands above).
 
 ### Lifecycle & Resource Disposal Checklist
-Before considering any feature involving streams, timers, or animations complete, verify:
-- Every `StreamSubscription` is cancelled in `close()` or the corresponding BLoC's `onClose`.
+Every BLoC/Cubit with a `StreamSubscription` must override `close()` and cancel it there. Before considering any feature involving streams, timers, or animations complete, verify:
+- Every `StreamSubscription` is cancelled in `close()`.
 - Every `Timer` or `AnimationController` is properly disposed.
-- All Isar dynamic query streams are properly closed or managed via BLoC lifecycle.
+- All Isar dynamic query streams are closed or managed via BLoC lifecycle.
+
+### Testing Conventions
+- **Golden tests** are tagged with `@Tags(['golden'])` and skipped on non-macOS (`skip: !Platform.isMacOS`); config lives in `dart_test.yaml`.
+- **HydratedCubit test setup:** tests for `AppThemeCubit` or any widget using it must set `HydratedBloc.storage = _TestStorage()` (an in-memory `Storage` implementation).
+- **Fake repo leak prevention:** `FakeTodoRepository` and `FakeUserPreferencesRepository` expose a `dispose()` method — always call it in `tearDown` to close the internal `StreamController`.
+- **Wrap-pattern repos** (e.g. `_FailingOnceTodoRepository`) contain a `FakeTodoRepository` inside them — ensure the inner fake is also disposed in `tearDown`.
 
 ### Mandatory Verification Pipeline
-After any modification within the `lib/**` directory, you MUST execute the following pipeline in strict order:
-1. `dart run build_runner build`
-2. `flutter analyze`
-3. `flutter test`
+After any modification within the `lib/**` directory, you MUST execute the following pipeline in strict order (matches `before_push.sh`):
+1. `flutter pub get`
+2. `flutter gen-l10n`
+3. `dart run build_runner build --delete-conflicting-outputs`
+4. `dart format --output=none --set-exit-if-changed lib test bin scripts`
+5. `flutter analyze`
+6. `flutter test`
 
 A task is NOT considered complete until all steps pass with zero errors and zero failing tests, AND the Lifecycle & Resource Disposal Checklist above has been explicitly verified. Fix any arising issues autonomously, subject to the Guardrails above.
