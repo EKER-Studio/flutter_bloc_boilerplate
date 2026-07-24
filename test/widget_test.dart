@@ -50,10 +50,8 @@ void main() {
                 TodoBloc(FakeTodoRepository())..add(const WatchTodos()),
           ),
           BlocProvider<SettingsCubit>(
-            create: (_) => SettingsCubit(
-              FakeUserPreferencesRepository(),
-              AppThemeCubit(),
-            ),
+            create: (_) =>
+                SettingsCubit(FakeUserPreferencesRepository(), AppThemeCubit()),
           ),
         ],
         child: const MaterialApp(home: TodoScreen()),

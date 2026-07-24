@@ -14,7 +14,7 @@ import 'settings_state.dart';
 class SettingsCubit extends Cubit<SettingsState> {
   /// Creates a cubit backed by the given repository.
   SettingsCubit(this._repository, this._appThemeCubit)
-      : super(const SettingsInitial());
+    : super(const SettingsInitial());
 
   final UserPreferencesRepository _repository;
   final AppThemeCubit _appThemeCubit;
