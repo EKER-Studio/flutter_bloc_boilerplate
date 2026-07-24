@@ -26,6 +26,7 @@ import '../../features/todos/domain/repositories/todo_repository.dart' as _i408;
 import '../../features/todos/presentation/bloc/todo_bloc.dart' as _i869;
 import '../database/database_module.dart' as _i215;
 import '../network/network_module.dart' as _i200;
+import '../presentation/cubit/app_theme_cubit.dart' as _i622;
 
 const String _dev = 'dev';
 const String _prod = 'prod';
@@ -43,6 +44,7 @@ extension GetItInjectableX on _i174.GetIt {
       () => databaseModule.isar,
       preResolve: true,
     );
+    gh.lazySingleton<_i622.AppThemeCubit>(() => _i622.AppThemeCubit());
     gh.lazySingleton<_i1060.UserPreferencesRepository>(
       () => _i969.UserPreferencesRepositoryImpl(gh<_i214.Isar>()),
     );
