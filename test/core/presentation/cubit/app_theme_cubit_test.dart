@@ -1,35 +1,36 @@
-import 'package:flutter_test/flutter_test.dart';
-import 'package:hydrated_bloc/hydrated_bloc.dart';
+import 'dart:async';
 
+import 'package:flutter_test/flutter_test.dart';
+
+import 'package:flutter_bloc_boilerplate/core/errors/failure.dart';
 import 'package:flutter_bloc_boilerplate/core/presentation/cubit/app_theme_cubit.dart';
 import 'package:flutter_bloc_boilerplate/core/presentation/cubit/app_theme_state.dart';
 import 'package:flutter_bloc_boilerplate/features/settings/domain/entities/user_preferences.dart';
+import 'package:flutter_bloc_boilerplate/features/settings/domain/repositories/user_preferences_repository.dart';
 
-/// In-memory [Storage] for use in tests so [AppThemeCubit] (a [HydratedCubit])
-/// can be instantiated without real file-system or web storage.
-class _TestStorage implements Storage {
-  final _store = <String, dynamic>{};
+class _TestThemeRepository implements UserPreferencesRepository {
+  _TestThemeRepository(this._themeModeStream);
 
-  @override
-  dynamic read(String key) => _store[key];
+  final Stream<UserThemeMode> _themeModeStream;
 
   @override
-  Future<void> write(String key, dynamic value) async {
-    _store[key] = value;
-  }
+  Stream<UserPreferences> watch() => const Stream.empty();
 
   @override
-  Future<void> delete(String key) async {
-    _store.remove(key);
-  }
+  Stream<UserThemeMode> watchThemeMode() => _themeModeStream;
 
   @override
-  Future<void> clear() async {
-    _store.clear();
-  }
+  Future<UserPreferences> get() async => UserPreferences.defaults();
 
   @override
-  Future<void> close() async {}
+  Future<(bool success, Failure? failure)> updateThemeMode(
+    UserThemeMode themeMode,
+  ) async => (true, null);
+
+  @override
+  Future<(bool success, Failure? failure)> updateNotificationsEnabled(
+    bool isEnabled,
+  ) async => (true, null);
 }
 
 void main() {
@@ -98,49 +99,30 @@ void main() {
   });
 
   group('AppThemeCubit', () {
-    setUp(() {
-      HydratedBloc.storage = _TestStorage();
-    });
+    test(
+      'initial state is system when no theme stream value is emitted yet',
+      () {
+        final controller = StreamController<UserThemeMode>();
+        final cubit = AppThemeCubit(_TestThemeRepository(controller.stream));
+        expect(cubit.state.mode, UserThemeMode.system);
+        controller.close();
+        cubit.close();
+      },
+    );
 
-    test('initial state is system', () {
-      final cubit = AppThemeCubit();
-      expect(cubit.state.mode, UserThemeMode.system);
-      cubit.close();
-    });
+    test('reacts to theme mode updates from the repository stream', () async {
+      final controller = StreamController<UserThemeMode>();
+      final cubit = AppThemeCubit(_TestThemeRepository(controller.stream));
 
-    test('setThemeMode emits new state', () {
-      final cubit = AppThemeCubit();
-      expect(cubit.state.mode, UserThemeMode.system);
-
-      cubit.setThemeMode(UserThemeMode.dark);
+      controller.add(UserThemeMode.dark);
+      await Future<void>.delayed(Duration.zero);
       expect(cubit.state.mode, UserThemeMode.dark);
 
-      cubit.setThemeMode(UserThemeMode.light);
+      controller.add(UserThemeMode.light);
+      await Future<void>.delayed(Duration.zero);
       expect(cubit.state.mode, UserThemeMode.light);
 
-      cubit.close();
-    });
-
-    test('setThemeMode with same value emits immediately', () {
-      final cubit = AppThemeCubit();
-      cubit.setThemeMode(UserThemeMode.dark);
-      expect(cubit.state.mode, UserThemeMode.dark);
-      cubit.close();
-    });
-
-    test('fromJson in cubit falls back when storage is corrupt', () {
-      final cubit = AppThemeCubit();
-      final recovered = cubit.fromJson({'mode': 'not_an_int'});
-      expect(recovered, isNotNull);
-      expect(recovered!.mode, UserThemeMode.system);
-      cubit.close();
-    });
-
-    test('toJson serializes correctly', () {
-      final cubit = AppThemeCubit();
-      cubit.setThemeMode(UserThemeMode.light);
-      final json = cubit.toJson(cubit.state);
-      expect(json, {'mode': 0});
+      controller.close();
       cubit.close();
     });
   });

@@ -35,6 +35,14 @@ class FakeUserPreferencesRepository implements UserPreferencesRepository {
   }
 
   @override
+  Stream<UserThemeMode> watchThemeMode() async* {
+    yield _preferences.themeMode;
+    await for (final prefs in _streamController.stream) {
+      yield prefs.themeMode;
+    }
+  }
+
+  @override
   Future<UserPreferences> get() async {
     return _preferences;
   }

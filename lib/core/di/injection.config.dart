@@ -44,7 +44,6 @@ extension GetItInjectableX on _i174.GetIt {
       () => databaseModule.isar,
       preResolve: true,
     );
-    gh.lazySingleton<_i622.AppThemeCubit>(() => _i622.AppThemeCubit());
     gh.lazySingleton<_i1060.UserPreferencesRepository>(
       () => _i969.UserPreferencesRepositoryImpl(gh<_i214.Isar>()),
     );
@@ -55,11 +54,11 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i408.TodoRepository>(
       () => _i888.TodoRepositoryImpl(gh<_i214.Isar>()),
     );
+    gh.lazySingleton<_i622.AppThemeCubit>(
+      () => _i622.AppThemeCubit(gh<_i1060.UserPreferencesRepository>()),
+    );
     gh.factory<_i792.SettingsCubit>(
-      () => _i792.SettingsCubit(
-        gh<_i1060.UserPreferencesRepository>(),
-        gh<_i622.AppThemeCubit>(),
-      ),
+      () => _i792.SettingsCubit(gh<_i1060.UserPreferencesRepository>()),
     );
     gh.lazySingleton<_i361.Dio>(
       () => networkModule.dioProd,

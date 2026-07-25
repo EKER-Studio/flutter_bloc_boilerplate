@@ -4,7 +4,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
 
 import '../../../../core/errors/failure.dart';
-import '../../../../core/presentation/cubit/app_theme_cubit.dart';
 import '../../domain/entities/user_preferences.dart';
 import '../../domain/repositories/user_preferences_repository.dart';
 import 'settings_state.dart';
@@ -15,8 +14,7 @@ class SettingsCubit extends Cubit<SettingsState> {
   /// Creates a cubit backed by the given repository and immediately starts
   /// watching the preferences stream so the widget tree never sees a stale
   /// [SettingsInitial] state.
-  SettingsCubit(this._repository, this._appThemeCubit)
-    : super(const SettingsInitial()) {
+  SettingsCubit(this._repository) : super(const SettingsInitial()) {
     _startListening();
   }
 
@@ -41,18 +39,18 @@ class SettingsCubit extends Cubit<SettingsState> {
   }
 
   final UserPreferencesRepository _repository;
-  final AppThemeCubit _appThemeCubit;
   StreamSubscription<UserPreferences>? _prefsSubscription;
   UserPreferences? _lastKnownPreferences;
 
-  /// Persists the selected theme mode and immediately applies it via
-  /// [AppThemeCubit]. Reverts to the last known preferences on failure so
-  /// the UI does not get stuck in an error state.
+  /// Persists the selected theme mode and relies on the repository stream to
+  /// propagate the change to the runtime theme state. Reverts to the last
+  /// known preferences on failure so the UI does not get stuck in an error
+  /// state.
   Future<void> updateThemeMode(UserThemeMode mode) async {
     final snapshot = _lastKnownPreferences;
     final result = await _repository.updateThemeMode(mode);
     if (result.$1) {
-      _appThemeCubit.setThemeMode(mode);
+      return;
     } else if (snapshot != null) {
       emit(SettingsLoadSuccess(snapshot));
     } else {

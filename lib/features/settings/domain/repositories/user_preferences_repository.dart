@@ -6,6 +6,9 @@ abstract class UserPreferencesRepository {
   /// Watches the user preferences.
   Stream<UserPreferences> watch();
 
+  /// Watches the theme mode preference.
+  Stream<UserThemeMode> watchThemeMode();
+
   /// Gets the current user preferences.
   Future<UserPreferences> get();
 

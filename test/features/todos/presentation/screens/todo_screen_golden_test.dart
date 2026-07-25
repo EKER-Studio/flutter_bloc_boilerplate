@@ -53,14 +53,15 @@ void main() {
     await tester.pumpWidget(
       MultiBlocProvider(
         providers: [
-          BlocProvider<AppThemeCubit>(create: (_) => AppThemeCubit()),
+          BlocProvider<AppThemeCubit>(
+            create: (_) => AppThemeCubit(FakeUserPreferencesRepository()),
+          ),
           BlocProvider<TodoBloc>(
             create: (_) =>
                 TodoBloc(FakeTodoRepository())..add(const WatchTodos()),
           ),
           BlocProvider<SettingsCubit>(
-            create: (_) =>
-                SettingsCubit(FakeUserPreferencesRepository(), AppThemeCubit()),
+            create: (_) => SettingsCubit(FakeUserPreferencesRepository()),
           ),
         ],
         child: MaterialApp(

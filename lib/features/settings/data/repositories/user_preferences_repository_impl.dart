@@ -46,6 +46,16 @@ class UserPreferencesRepositoryImpl implements UserPreferencesRepository {
     );
   }
 
+  @override
+  Stream<UserThemeMode> watchThemeMode() {
+    return _watchWithReconnect(
+      () => _isar.userPreferencesModels
+          .watchObject(userPreferencesSingletonId, fireImmediately: true)
+          .map((model) => _mapOrDefault(model).themeMode),
+      'watchThemeMode',
+    );
+  }
+
   /// Wraps an Isar watch stream in an auto-reconnecting loop so transient
   /// database errors don't permanently terminate the subscription.
   ///

@@ -39,10 +39,7 @@ class _TestStorage implements Storage {
 void main() {
   testWidgets('Settings screen renders with preferences', (tester) async {
     HydratedBloc.storage = _TestStorage();
-    final cubit = SettingsCubit(
-      FakeUserPreferencesRepository(),
-      AppThemeCubit(),
-    );
+    final cubit = SettingsCubit(FakeUserPreferencesRepository());
 
     await tester.pumpWidget(
       BlocProvider.value(

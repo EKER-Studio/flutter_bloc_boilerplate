@@ -55,7 +55,6 @@ void main() {
           isNotificationsEnabled: true,
         ),
       ),
-      AppThemeCubit(),
     );
 
     await tester.pumpWidget(

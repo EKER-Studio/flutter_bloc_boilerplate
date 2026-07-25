@@ -1,11 +1,8 @@
 import 'dart:async';
 import 'dart:developer';
 
-import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
-import 'package:hydrated_bloc/hydrated_bloc.dart';
 import 'package:injectable/injectable.dart';
-import 'package:path_provider/path_provider.dart';
 
 import 'app.dart';
 import 'core/di/injection.dart';
@@ -33,7 +30,6 @@ Future<void> main() async {
         );
       };
 
-      await _initHydratedStorage();
       await configureDependencies(Environment.prod);
 
       runApp(const App());
@@ -43,33 +39,4 @@ Future<void> main() async {
       log('Uncaught async error', error: error, stackTrace: stack);
     },
   );
-}
-
-Future<void> _initHydratedStorage() async {
-  try {
-    final storageDirectory = kIsWeb
-        ? HydratedStorageDirectory.web
-        : HydratedStorageDirectory(
-            (await getApplicationDocumentsDirectory()).path,
-          );
-    HydratedBloc.storage = await HydratedStorage.build(
-      storageDirectory: storageDirectory,
-    );
-  } catch (error) {
-    log('HydratedStorage init failed: $error');
-    try {
-      final storageDirectory = kIsWeb
-          ? HydratedStorageDirectory.web
-          : HydratedStorageDirectory(
-              (await getApplicationDocumentsDirectory()).path,
-            );
-      final storage = await HydratedStorage.build(
-        storageDirectory: storageDirectory,
-      );
-      await storage.clear();
-      HydratedBloc.storage = storage;
-    } catch (_) {
-      log('HydratedStorage recovery failed — running without persistence');
-    }
-  }
 }

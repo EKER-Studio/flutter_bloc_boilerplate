@@ -25,6 +25,9 @@ class _FailingOnceThemeRepository implements UserPreferencesRepository {
   Stream<UserPreferences> watch() => _inner.watch();
 
   @override
+  Stream<UserThemeMode> watchThemeMode() => _inner.watchThemeMode();
+
+  @override
   Future<UserPreferences> get() => _inner.get();
 
   @override
@@ -52,6 +55,11 @@ class _ErrorStreamRepository implements UserPreferencesRepository {
   }
 
   @override
+  Stream<UserThemeMode> watchThemeMode() async* {
+    throw const DatabaseFailure('stream error');
+  }
+
+  @override
   Future<UserPreferences> get() async => UserPreferences.defaults();
 
   @override
@@ -73,6 +81,9 @@ class _ErrorStreamRepository implements UserPreferencesRepository {
 class _SilentRepository implements UserPreferencesRepository {
   @override
   Stream<UserPreferences> watch() => const Stream.empty();
+
+  @override
+  Stream<UserThemeMode> watchThemeMode() => const Stream.empty();
 
   @override
   Future<UserPreferences> get() async => UserPreferences.defaults();
@@ -134,13 +145,13 @@ void main() {
   group('SettingsCubit', () {
     blocTest<SettingsCubit, SettingsState>(
       'constructor emits LoadSuccess with defaults',
-      build: () => SettingsCubit(repository, AppThemeCubit()),
+      build: () => SettingsCubit(repository),
       expect: () => [isA<SettingsLoadSuccess>()],
     );
 
     blocTest<SettingsCubit, SettingsState>(
       'updateThemeMode: watch stream emits updated theme',
-      build: () => SettingsCubit(repository, AppThemeCubit()),
+      build: () => SettingsCubit(repository),
       act: (cubit) async {
         await cubit.updateThemeMode(UserThemeMode.dark);
       },
@@ -156,7 +167,7 @@ void main() {
 
     blocTest<SettingsCubit, SettingsState>(
       'updateNotificationsEnabled: watch stream emits updated preference',
-      build: () => SettingsCubit(repository, AppThemeCubit()),
+      build: () => SettingsCubit(repository),
       act: (cubit) async {
         await cubit.updateNotificationsEnabled(false);
       },
@@ -173,7 +184,7 @@ void main() {
 
     blocTest<SettingsCubit, SettingsState>(
       'updateNotificationsEnabled: emits success without prior watch snapshot',
-      build: () => SettingsCubit(_SilentRepository(), AppThemeCubit()),
+      build: () => SettingsCubit(_SilentRepository()),
       act: (cubit) async {
         await cubit.updateNotificationsEnabled(false);
       },
@@ -193,7 +204,7 @@ void main() {
           repository,
           const DatabaseFailure('write error'),
         );
-        return SettingsCubit(failingRepo, AppThemeCubit());
+        return SettingsCubit(failingRepo);
       },
       act: (cubit) async {
         // Let the constructor's stream microtask populate _lastKnownPreferences.
@@ -217,13 +228,13 @@ void main() {
 
     blocTest<SettingsCubit, SettingsState>(
       'watch stream error without snapshot emits SettingsLoadFailure',
-      build: () => SettingsCubit(_ErrorStreamRepository(), AppThemeCubit()),
+      build: () => SettingsCubit(_ErrorStreamRepository()),
       expect: () => [isA<SettingsLoadFailure>()],
     );
 
     blocTest<SettingsCubit, SettingsState>(
       'close() cancels subscription and does not emit after',
-      build: () => SettingsCubit(repository, AppThemeCubit()),
+      build: () => SettingsCubit(repository),
       act: (cubit) async {
         // Let the constructor's stream microtask emit the initial load.
         await Future<void>.delayed(Duration.zero);
