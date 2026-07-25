@@ -73,6 +73,68 @@ class _FailingOnceTodoRepository implements TodoRepository {
   }
 }
 
+/// A repository whose [watchAll] stream errors on demand, used to reproduce
+/// the "emit was called after an event handler completed normally" regression
+/// (the `Emitter` captured by the synchronous [WatchTodos] handler is already
+/// closed by the time an asynchronous stream error arrives, so it must be
+/// routed through `add(TodoWatchFailed(...))` rather than `emit()` directly).
+class _WatchErroringTodoRepository implements TodoRepository {
+  _WatchErroringTodoRepository(this._inner);
+
+  final FakeTodoRepository _inner;
+  final _errorController = StreamController<List<Todo>>.broadcast();
+
+  void failWatchWith(Object error) => _errorController.addError(error);
+
+  void dispose() {
+    _errorController.close();
+    _inner.dispose();
+  }
+
+  @override
+  Stream<List<Todo>> watchAll() {
+    // Manual merge (not sequential yield*): the inner fake's stream never
+    // completes on its own, so chaining would make the error stream
+    // unreachable.
+    final controller = StreamController<List<Todo>>.broadcast();
+    final innerSub = _inner.watchAll().listen(
+      controller.add,
+      onError: controller.addError,
+    );
+    final errorSub = _errorController.stream.listen(
+      controller.add,
+      onError: controller.addError,
+    );
+    controller.onCancel = () {
+      innerSub.cancel();
+      errorSub.cancel();
+    };
+    return controller.stream;
+  }
+
+  @override
+  Stream<Todo?> watchById(int id) => _inner.watchById(id);
+
+  @override
+  Future<List<Todo>> getAll() => _inner.getAll();
+
+  @override
+  Future<(bool success, Failure? failure)> add({required String title}) =>
+      _inner.add(title: title);
+
+  @override
+  Future<(bool success, Failure? failure)> toggleCompleted({required int id}) =>
+      _inner.toggleCompleted(id: id);
+
+  @override
+  Future<(bool success, Failure? failure)> delete({required int id}) =>
+      _inner.delete(id: id);
+
+  @override
+  Future<(bool success, Failure? failure)> restore(Todo todo) =>
+      _inner.restore(todo);
+}
+
 final _created = Todo(
   id: 1,
   title: 'Test',
@@ -425,6 +487,33 @@ void main() {
             contains('toggle'),
           ),
         ],
+      );
+
+      final erroringRepo = _WatchErroringTodoRepository(FakeTodoRepository());
+
+      blocTest<TodoBloc, TodoState>(
+        'watch stream error emits TodoLoadFailure instead of throwing '
+        '(regression test: emit-after-handler-completed)',
+        build: () => TodoBloc(erroringRepo),
+        act: (bloc) async {
+          bloc.add(const WatchTodos());
+          await Future<void>.delayed(Duration.zero);
+          erroringRepo.failWatchWith(const DatabaseFailure('watch failed'));
+        },
+        expect: () => [
+          const TodoLoadInProgress(),
+          isA<TodoLoadSuccess>(),
+          isA<TodoLoadFailure>().having(
+            (s) => s.failure.message,
+            'message',
+            contains('watch failed'),
+          ),
+        ],
+        // Fails loudly (instead of a swallowed StateError) if `onError`
+        // ever goes back to calling `emit()` directly from the stream
+        // listener rather than routing through `add(TodoWatchFailed(...))`.
+        errors: () => isEmpty,
+        tearDown: erroringRepo.dispose,
       );
     });
 

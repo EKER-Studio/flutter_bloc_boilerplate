@@ -16,6 +16,7 @@ class TodoBloc extends Bloc<TodoEvent, TodoState> {
   TodoBloc(this._repository) : super(const TodoInitial()) {
     on<TodosUpdated>(_onTodosUpdated);
     on<WatchTodos>(_onWatchTodos);
+    on<TodoWatchFailed>(_onTodoWatchFailed);
     on<TodoAdded>(_onTodoAdded);
     on<TodoToggled>(_onTodoToggled);
     on<TodoDeleted>(_onTodoDeleted);
@@ -40,9 +41,13 @@ class TodoBloc extends Bloc<TodoEvent, TodoState> {
         final failure = error is Failure
             ? error
             : DatabaseFailure('Watch stream error: ${error.toString()}');
-        emit(TodoLoadFailure(failure));
+        add(TodoWatchFailed(failure));
       },
     );
+  }
+
+  void _onTodoWatchFailed(TodoWatchFailed event, Emitter<TodoState> emit) {
+    emit(TodoLoadFailure(event.failure));
   }
 
   void _onTodosUpdated(TodosUpdated event, Emitter<TodoState> emit) {
