@@ -84,6 +84,12 @@ This is a Local-First, AI-Native boilerplate utilizing Clean Architecture under 
 - **Custom Lint Rule:** `avoid_infrastructure_imports_in_presentation` — the presentation layer must not import data-layer files.
 - **Entrypoints:** `lib/main.dart` (DI init + `runApp`) -> `lib/app.dart` (`MultiBlocProvider` + `MaterialApp`). DI is configured via `configureDependencies(Environment.prod)` in `main.dart`.
 
+#### Strict Dependency Rules
+- **No data-model leakage into presentation:** Presentation files (`bloc`, `state`, `event`, widgets) must never import `TodoModel`, `UserPreferencesModel`, or any file from `lib/features/*/data/`. Only domain entities (`Todo`, `UserPreferences`) and failure types may be referenced.
+- **No Isar annotations in presentation:** `@collection`, `@property`, `@Index`, `Isar.autoIncrement`, and any other Isar-specific annotations or types must not appear in presentation-layer code.
+- **Mappers must be stateless:** Mapper functions (e.g. `toDomain()`, `toData()`) must be synchronous, side-effect-free extension methods or top-level functions. They must not hold mutable state, perform I/O, or depend on external services.
+- **One-way dependency:** Imports flow inward toward the domain. Presentation imports domain; data imports domain and Isar. Domain imports nothing project-specific.
+
 ### Generated Files
 - `*.g.dart` files hold Injectable DI config and Isar schemas, use the `part of` directive, and are excluded from `flutter analyze`.
 - Regenerate whenever annotations change (see Build & Generation Commands above).
