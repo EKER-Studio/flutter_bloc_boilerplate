@@ -40,10 +40,17 @@ class TodoDeleted extends TodoEvent {
   final Todo todo;
 }
 
-/// Restores the most recently deleted todo.
+/// Restores a previously deleted todo identified by [todoId].
+///
+/// The handler looks up the matching [Todo] entity in the internal undo queue
+/// by [todoId] rather than blindly restoring the last item, preventing
+/// restoration mismatches when concurrent deletions fail or the queue shifts.
 class TodoRestored extends TodoEvent {
-  /// Creates a [TodoRestored] event.
-  const TodoRestored();
+  /// Creates a [TodoRestored] event for the todo with [todoId].
+  const TodoRestored(this.todoId);
+
+  /// The id of the todo to restore.
+  final int todoId;
 }
 
 /// Internal event emitted by the watch stream subscription when the repository

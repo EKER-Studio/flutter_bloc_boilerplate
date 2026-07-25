@@ -80,6 +80,20 @@ final _created = Todo(
   createdAt: DateTime(2026),
 );
 
+final _todoFirst = Todo(
+  id: 1,
+  title: 'First',
+  isCompleted: false,
+  createdAt: DateTime(2026),
+);
+
+final _todoSecond = Todo(
+  id: 2,
+  title: 'Second',
+  isCompleted: false,
+  createdAt: DateTime(2026),
+);
+
 final _second = Todo(
   id: 2,
   title: 'Second',
@@ -261,7 +275,7 @@ void main() {
           await Future<void>.delayed(Duration.zero);
           bloc.add(TodoDeleted(_created));
           await Future<void>.delayed(Duration.zero);
-          bloc.add(const TodoRestored());
+          bloc.add(TodoRestored(_created.id));
         },
         expect: () => [
           const TodoLoadInProgress(),
@@ -287,9 +301,82 @@ void main() {
         act: (bloc) async {
           bloc.add(const WatchTodos());
           await Future<void>.delayed(Duration.zero);
-          bloc.add(const TodoRestored());
+          bloc.add(TodoRestored(42));
         },
         expect: () => [const TodoLoadInProgress(), isA<TodoLoadSuccess>()],
+      );
+
+      blocTest<TodoBloc, TodoState>(
+        'TodoRestored restores the correct item by id, not just the last',
+        build: () {
+          final repo = FakeTodoRepository(
+            initialTodos: [_todoFirst, _todoSecond],
+          );
+          repos.add(repo);
+          return TodoBloc(repo);
+        },
+        act: (bloc) async {
+          bloc.add(const WatchTodos());
+          await Future<void>.delayed(Duration.zero);
+          bloc.add(TodoDeleted(_todoFirst));
+          await Future<void>.delayed(Duration.zero);
+          bloc.add(TodoDeleted(_todoSecond));
+          await Future<void>.delayed(Duration.zero);
+          // Restore the first deleted todo (_todoFirst) even though it's no
+          // longer at the tail of the queue.
+          bloc.add(TodoRestored(_todoFirst.id));
+        },
+        expect: () => [
+          const TodoLoadInProgress(),
+          isA<TodoLoadSuccess>().having(
+            (s) => s.todos.length,
+            'initial count',
+            2,
+          ),
+          isA<TodoLoadSuccess>().having(
+            (s) => s.todos.length,
+            'after first delete count',
+            1,
+          ),
+          isA<TodoLoadSuccess>().having(
+            (s) => s.todos.length,
+            'after second delete count',
+            0,
+          ),
+          isA<TodoLoadSuccess>()
+              .having((s) => s.todos.length, 'after restore count', 1)
+              .having((s) => s.todos.first.id, 'restored id', _todoFirst.id),
+        ],
+      );
+
+      blocTest<TodoBloc, TodoState>(
+        'TodoRestored with non-existent id does nothing',
+        build: () {
+          final repo = FakeTodoRepository(initialTodos: [_created]);
+          repos.add(repo);
+          return TodoBloc(repo);
+        },
+        act: (bloc) async {
+          bloc.add(const WatchTodos());
+          await Future<void>.delayed(Duration.zero);
+          bloc.add(TodoDeleted(_created));
+          await Future<void>.delayed(Duration.zero);
+          bloc.add(TodoRestored(999));
+        },
+        expect: () => [
+          const TodoLoadInProgress(),
+          isA<TodoLoadSuccess>().having(
+            (s) => s.todos.length,
+            'initial count',
+            1,
+          ),
+          isA<TodoLoadSuccess>().having(
+            (s) => s.todos.length,
+            'after delete count',
+            0,
+          ),
+          // TodoRestored with non-existent id does nothing — no extra emit.
+        ],
       );
     });
 

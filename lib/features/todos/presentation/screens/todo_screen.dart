@@ -54,8 +54,9 @@ class TodoScreen extends StatelessWidget {
                     content: Text('Deleted "${state.lastDeletedTodo!.title}"'),
                     action: SnackBarAction(
                       label: 'Undo',
-                      onPressed: () =>
-                          context.read<TodoBloc>().add(const TodoRestored()),
+                      onPressed: () => context.read<TodoBloc>().add(
+                        TodoRestored(state.lastDeletedTodo!.id),
+                      ),
                     ),
                   ),
                 );
