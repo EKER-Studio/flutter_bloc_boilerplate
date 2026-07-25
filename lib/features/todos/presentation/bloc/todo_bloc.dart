@@ -36,7 +36,12 @@ class TodoBloc extends Bloc<TodoEvent, TodoState> {
     _todosSubscription?.cancel();
     _todosSubscription = _repository.watchAll().listen(
       (todos) => add(TodosUpdated(todos)),
-      onError: (Object error) => add(TodosUpdated(<Todo>[])),
+      onError: (Object error) {
+        final failure = error is Failure
+            ? error
+            : DatabaseFailure('Watch stream error: ${error.toString()}');
+        emit(TodoLoadFailure(failure));
+      },
     );
   }
 
