@@ -1,3 +1,5 @@
+import 'package:flutter_bloc_boilerplate/core/errors/failure.dart';
+
 import '../../domain/entities/todo.dart';
 
 /// Events that can be dispatched to [TodoBloc].
@@ -61,4 +63,14 @@ class TodosUpdated extends TodoEvent {
 
   /// The complete current list of todos.
   final List<Todo> todos;
+}
+
+/// Internal event emitted by the watch stream subscription when the repository
+/// reports an error. Not intended to be dispatched from the UI.
+class TodoWatchFailed extends TodoEvent {
+  /// Creates a [TodoWatchFailed] event with the given [failure].
+  const TodoWatchFailed(this.failure);
+
+  /// Describes what went wrong.
+  final Failure failure;
 }
