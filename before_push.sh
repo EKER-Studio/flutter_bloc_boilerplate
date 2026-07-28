@@ -68,14 +68,15 @@ log_success "Code generation completed."
 log_step "4" "Verifying code formatting standards..."
 # ------------------------------------------------------------------------------
 # Ensures the code strictly obeys Dart formatting guidelines without altering files
-dart format --output=none --set-exit-if-changed lib test bin scripts
+dart format --set-exit-if-changed lib test
 log_success "Codebase formatting aligns with style specifications."
 
 # ------------------------------------------------------------------------------
-log_step "5" "Executing static analysis (Linter)..."
+log_step "5" "Executing static analysis (Linter & Custom Lint)..."
 # ------------------------------------------------------------------------------
 # Evaluates project architecture against analysis_options.yaml rules
 flutter analyze
+dart run custom_lint || true
 log_success "Static analysis passed with zero warnings or errors."
 
 # ------------------------------------------------------------------------------

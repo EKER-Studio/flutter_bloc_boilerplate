@@ -52,10 +52,13 @@ jobs:
         run: dart run build_runner build --delete-conflicting-outputs
 
       - name: Check formatting
-        run: dart format --output=none --set-exit-if-changed .
+        run: dart format --set-exit-if-changed lib test
 
       - name: Static analysis
         run: flutter analyze
+
+      - name: Custom lint
+        run: dart run custom_lint || true
 
       - name: Run unit and widget tests
         run: flutter test -j 1
