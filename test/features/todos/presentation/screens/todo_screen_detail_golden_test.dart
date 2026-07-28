@@ -11,6 +11,7 @@ import 'package:flutter_bloc_boilerplate/features/todos/domain/entities/todo.dar
 import 'package:flutter_bloc_boilerplate/features/todos/presentation/bloc/todo_bloc.dart';
 import 'package:flutter_bloc_boilerplate/features/todos/presentation/bloc/todo_event.dart';
 import 'package:flutter_bloc_boilerplate/features/todos/presentation/screens/todo_screen_detail.dart';
+import 'package:flutter_bloc_boilerplate/l10n/app_localizations.dart';
 
 import '../../../../helpers/fake_todo_repository.dart';
 
@@ -34,7 +35,11 @@ void main() {
       await tester.pumpWidget(
         BlocProvider.value(
           value: TodoBloc(repository)..add(const WatchTodos()),
-          child: const MaterialApp(home: TodoDetailScreen(todoId: 1)),
+          child: const MaterialApp(
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            home: TodoDetailScreen(todoId: 1),
+          ),
         ),
       );
 

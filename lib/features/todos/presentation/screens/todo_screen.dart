@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/errors/failure.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../../settings/presentation/screens/settings_screen.dart';
 import '../../domain/entities/todo.dart';
 import '../bloc/todo_bloc.dart';
@@ -26,54 +27,22 @@ class TodoScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MultiBlocListener(
-      listeners: [
-        BlocListener<TodoBloc, TodoState>(
-          listenWhen: (previous, current) =>
-              current is TodoLoadFailure && previous is! TodoLoadFailure,
-          listener: (context, state) {
-            if (state is TodoLoadFailure) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text(state.failure.userMessage)),
-              );
-            }
-          },
-        ),
-        BlocListener<TodoBloc, TodoState>(
-          listenWhen: (previous, current) =>
-              current is TodoLoadSuccess &&
-              current.lastDeletedTodo != null &&
-              (previous is! TodoLoadSuccess ||
-                  previous.lastDeletedTodo != current.lastDeletedTodo),
-          listener: (context, state) {
-            if (state is TodoLoadSuccess && state.lastDeletedTodo != null) {
-              ScaffoldMessenger.of(context)
-                ..hideCurrentSnackBar()
-                ..showSnackBar(
-                  SnackBar(
-                    content: Text('Deleted "${state.lastDeletedTodo!.title}"'),
-                    action: SnackBarAction(
-                      label: 'Undo',
-                      onPressed: () => context.read<TodoBloc>().add(
-                        TodoRestored(state.lastDeletedTodo!.id),
-                      ),
-                    ),
-                  ),
-                );
-            }
-          },
-        ),
-      ],
+    return BlocListener<TodoBloc, TodoState>(
+      listenWhen: (previous, current) =>
+          current is TodoLoadFailure && previous is! TodoLoadFailure,
+      listener: (context, state) {
+        if (state is TodoLoadFailure) {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(state.failure.userMessage)));
+        }
+      },
       child: BlocBuilder<TodoBloc, TodoState>(
         builder: (context, state) {
           return switch (state) {
             TodoInitial() => const SizedBox.shrink(),
-            TodoLoadInProgress() => _buildLoading(),
-            TodoLoadSuccess(:final todos, :final lastDeletedTodo) => _buildList(
-              context,
-              todos,
-              lastDeletedTodo,
-            ),
+            TodoLoadInProgress() => _buildLoading(context),
+            TodoLoadSuccess(:final todos) => _buildList(context, todos),
             TodoLoadFailure(:final failure) => _buildError(
               context,
               failure.userMessage,
@@ -84,21 +53,17 @@ class TodoScreen extends StatelessWidget {
     );
   }
 
-  Scaffold _buildLoading() {
+  Scaffold _buildLoading(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Todos')),
+      appBar: AppBar(title: Text(AppLocalizations.of(context).appTitle)),
       body: const Center(child: CircularProgressIndicator()),
     );
   }
 
-  Scaffold _buildList(
-    BuildContext context,
-    List<Todo> todos,
-    Todo? lastDeletedTodo,
-  ) {
+  Scaffold _buildList(BuildContext context, List<Todo> todos) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Todos'),
+        title: Text(AppLocalizations.of(context).appTitle),
         actions: [
           IconButton(
             tooltip: 'Settings',
@@ -121,8 +86,14 @@ class TodoScreen extends StatelessWidget {
                   todo: todo,
                   onToggle: () =>
                       context.read<TodoBloc>().add(TodoToggled(todo.id)),
-                  onDelete: () =>
-                      context.read<TodoBloc>().add(TodoDeleted(todo)),
+                  onDelete: () {
+                    context.read<TodoBloc>().add(TodoDeleted(todo));
+                    ScaffoldMessenger.of(context)
+                      ..hideCurrentSnackBar()
+                      ..showSnackBar(
+                        SnackBar(content: Text('Deleted "${todo.title}"')),
+                      );
+                  },
                 );
               },
             ),
@@ -136,7 +107,7 @@ class TodoScreen extends StatelessWidget {
 
   Scaffold _buildError(BuildContext context, String message) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Todos')),
+      appBar: AppBar(title: Text(AppLocalizations.of(context).appTitle)),
       body: Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,

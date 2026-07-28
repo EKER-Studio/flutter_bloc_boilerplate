@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_bloc_boilerplate/features/todos/presentation/widgets/add_todo_fab.dart';
+import 'package:flutter_bloc_boilerplate/l10n/app_localizations.dart';
 
 void main() {
   testWidgets('AddTodoFab shows dialog and calls onAdd on submit', (
@@ -9,6 +10,8 @@ void main() {
     String? addedTitle;
     await tester.pumpWidget(
       MaterialApp(
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
         home: Scaffold(
           body: AddTodoFab(
             onAdd: (title) async {
@@ -40,6 +43,8 @@ void main() {
     bool onAddCalled = false;
     await tester.pumpWidget(
       MaterialApp(
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
         home: Scaffold(
           body: AddTodoFab(
             onAdd: (title) async {
@@ -73,6 +78,8 @@ void main() {
   testWidgets('AddTodoFab dialog closes on cancel', (tester) async {
     await tester.pumpWidget(
       MaterialApp(
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
         home: Scaffold(body: AddTodoFab(onAdd: (title) async {})),
       ),
     );

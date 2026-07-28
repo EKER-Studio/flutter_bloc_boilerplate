@@ -6,6 +6,7 @@ import 'package:hydrated_bloc/hydrated_bloc.dart';
 import 'package:flutter_bloc_boilerplate/core/presentation/cubit/app_theme_cubit.dart';
 import 'package:flutter_bloc_boilerplate/features/settings/presentation/cubit/settings_cubit.dart';
 import 'package:flutter_bloc_boilerplate/features/settings/presentation/screens/settings_screen.dart';
+import 'package:flutter_bloc_boilerplate/l10n/app_localizations.dart';
 
 import '../../../../helpers/fake_user_preferences_repository.dart';
 
@@ -44,7 +45,11 @@ void main() {
     await tester.pumpWidget(
       BlocProvider.value(
         value: cubit,
-        child: const MaterialApp(home: SettingsScreen()),
+        child: const MaterialApp(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: SettingsScreen(),
+        ),
       ),
     );
 
