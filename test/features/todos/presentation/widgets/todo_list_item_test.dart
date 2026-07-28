@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_bloc_boilerplate/features/todos/domain/entities/todo.dart';
 import 'package:flutter_bloc_boilerplate/features/todos/presentation/widgets/todo_list_item.dart';
+import 'package:flutter_bloc_boilerplate/l10n/app_localizations.dart';
 
 void main() {
   final tDate = DateTime(2024, 1, 1, 12, 0);
@@ -15,6 +16,8 @@ void main() {
   testWidgets('TodoListItem displays title and date', (tester) async {
     await tester.pumpWidget(
       MaterialApp(
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
         home: Scaffold(
           body: TodoListItem(todo: tTodo, onToggle: () {}, onDelete: () {}),
         ),
@@ -31,6 +34,8 @@ void main() {
     bool toggled = false;
     await tester.pumpWidget(
       MaterialApp(
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
         home: Scaffold(
           body: TodoListItem(
             todo: tTodo,
@@ -49,6 +54,8 @@ void main() {
     bool deleted = false;
     await tester.pumpWidget(
       MaterialApp(
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
         home: Scaffold(
           body: TodoListItem(
             todo: tTodo,
