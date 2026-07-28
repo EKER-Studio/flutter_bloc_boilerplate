@@ -30,8 +30,7 @@ analyzer:
 
 import_lint:
   rules:
-    - name: avoid_infrastructure_imports_in_presentation
-      severity: error
-      target: "package:flutter_bloc_boilerplate/features/*/presentation/**"
-      invalid_imports:
-        - "package:flutter_bloc_boilerplate/features/*/data/**"
+    avoid_infrastructure_imports_in_presentation:
+      target: "package:flutter_bloc_boilerplate/features/**/presentation/**"
+      from: "package:flutter_bloc_boilerplate/features/**/data/**"
+      except: []

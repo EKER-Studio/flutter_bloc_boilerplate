@@ -14,12 +14,12 @@ import 'todo_state.dart';
 class TodoBloc extends Bloc<TodoEvent, TodoState> {
   /// Creates a bloc backed by the given repository.
   TodoBloc(this._repository) : super(const TodoInitial()) {
-    on<TodosUpdated>(_onTodosUpdated);
     on<WatchTodos>(_onWatchTodos);
-    on<TodoWatchFailed>(_onTodoWatchFailed);
     on<TodoAdded>(_onTodoAdded);
     on<TodoToggled>(_onTodoToggled);
     on<TodoDeleted>(_onTodoDeleted);
+    on<TodoWatchFailed>(_onTodoWatchFailed);
+    on<TodosUpdated>(_onTodosUpdated);
   }
 
   final TodoRepository _repository;
