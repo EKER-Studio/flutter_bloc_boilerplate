@@ -81,7 +81,7 @@ This is a Local-First, AI-Native boilerplate utilizing Clean Architecture under 
 - **State Management:** BLoC (`flutter_bloc`) strictly.
 - **Data Flow:** UI (`BlocBuilder`/`BlocListener`) -> BLoC (`Bloc`) -> Repository Interface (domain) -> Repository Impl (data) -> Local DB (`isar_community`).
 - **Reactivity:** Handled purely via Isar streams. BLoCs listen to Isar collections and emit states accordingly.
-- **Custom Lint Rule:** `avoid_infrastructure_imports_in_presentation` — the presentation layer must not import data-layer files.
+- **Automated Import Guardrail:** `import_lint` analyzer plugin — enforces `avoid_infrastructure_imports_in_presentation` in `analysis_options.yaml`, prohibiting presentation layer files (`lib/features/*/presentation/**`) from importing data layer implementations (`lib/features/*/data/**`).
 - **Entrypoints:** `lib/main.dart` (DI init + `runApp`) -> `lib/app.dart` (`MultiBlocProvider` + `MaterialApp`). DI is configured via `configureDependencies(Environment.prod)` in `main.dart`.
 
 #### Strict Dependency Rules
