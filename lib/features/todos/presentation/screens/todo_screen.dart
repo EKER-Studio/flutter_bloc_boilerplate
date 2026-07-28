@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/errors/failure.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../../settings/presentation/screens/settings_screen.dart';
 import '../../domain/entities/todo.dart';
 import '../bloc/todo_bloc.dart';
@@ -40,7 +41,7 @@ class TodoScreen extends StatelessWidget {
         builder: (context, state) {
           return switch (state) {
             TodoInitial() => const SizedBox.shrink(),
-            TodoLoadInProgress() => _buildLoading(),
+            TodoLoadInProgress() => _buildLoading(context),
             TodoLoadSuccess(:final todos) => _buildList(context, todos),
             TodoLoadFailure(:final failure) => _buildError(
               context,
@@ -52,9 +53,9 @@ class TodoScreen extends StatelessWidget {
     );
   }
 
-  Scaffold _buildLoading() {
+  Scaffold _buildLoading(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Todos')),
+      appBar: AppBar(title: Text(AppLocalizations.of(context).appTitle)),
       body: const Center(child: CircularProgressIndicator()),
     );
   }
@@ -62,7 +63,7 @@ class TodoScreen extends StatelessWidget {
   Scaffold _buildList(BuildContext context, List<Todo> todos) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Todos'),
+        title: Text(AppLocalizations.of(context).appTitle),
         actions: [
           IconButton(
             tooltip: 'Settings',
@@ -106,7 +107,7 @@ class TodoScreen extends StatelessWidget {
 
   Scaffold _buildError(BuildContext context, String message) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Todos')),
+      appBar: AppBar(title: Text(AppLocalizations.of(context).appTitle)),
       body: Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,

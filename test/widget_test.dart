@@ -8,6 +8,7 @@ import 'package:flutter_bloc_boilerplate/features/settings/presentation/cubit/se
 import 'package:flutter_bloc_boilerplate/features/todos/presentation/bloc/todo_bloc.dart';
 import 'package:flutter_bloc_boilerplate/features/todos/presentation/bloc/todo_event.dart';
 import 'package:flutter_bloc_boilerplate/features/todos/presentation/screens/todo_screen.dart';
+import 'package:flutter_bloc_boilerplate/l10n/app_localizations.dart';
 
 import 'helpers/fake_todo_repository.dart';
 import 'helpers/fake_user_preferences_repository.dart';
@@ -53,7 +54,11 @@ void main() {
             create: (_) => SettingsCubit(FakeUserPreferencesRepository()),
           ),
         ],
-        child: const MaterialApp(home: TodoScreen()),
+        child: const MaterialApp(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: TodoScreen(),
+        ),
       ),
     );
 
