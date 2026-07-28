@@ -20,15 +20,11 @@ class TodoLoadInProgress extends TodoState {
 
 /// Emitted when todos were loaded or updated successfully.
 class TodoLoadSuccess extends TodoState {
-  /// Creates a [TodoLoadSuccess] state with the given [todos] and optional
-  /// [lastDeletedTodo].
-  const TodoLoadSuccess({required this.todos, this.lastDeletedTodo});
+  /// Creates a [TodoLoadSuccess] state with the given [todos].
+  const TodoLoadSuccess({required this.todos});
 
   /// The current list of todos.
   final List<Todo> todos;
-
-  /// The most recently deleted todo available for undo, or null.
-  final Todo? lastDeletedTodo;
 }
 
 /// Emitted when a todo operation failed.
