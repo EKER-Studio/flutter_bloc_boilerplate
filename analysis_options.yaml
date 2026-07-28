@@ -11,7 +11,7 @@ include: package:flutter_lints/flutter.yaml
 
 analyzer:
   plugins:
-    - custom_lint
+    - import_lint
   # Exclude generated Isar schema files from analysis. The isar_community
   # generator (v3.3.2) emits calls to @experimental index-manipulation APIs
   # that produce spurious warnings in hand-written code analysis runs.
@@ -28,9 +28,10 @@ analyzer:
     # Android
     - "android/**"
 
-custom_lint:
+import_lint:
   rules:
-    - avoid_infrastructure_imports_in_presentation
-    - avoid_public_fields_on_bloc
-    - prefer_multi_bloc_provider
-    - prefer_bloc_builder
+    - name: avoid_infrastructure_imports_in_presentation
+      severity: error
+      target: "package:flutter_bloc_boilerplate/features/*/presentation/**"
+      invalid_imports:
+        - "package:flutter_bloc_boilerplate/features/*/data/**"

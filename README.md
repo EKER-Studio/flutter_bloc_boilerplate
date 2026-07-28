@@ -238,7 +238,7 @@ flutter analyze
 flutter test
 ```
 
-- **BLoC/Cubit Tests (Unit)**: Validate loading / success / failure states, intercept CRUD logic, confirm stream subscription cancellation, and verify undo behavior. Powered by `bloc_test` and `mocktail`.
+- **BLoC/Cubit Tests (Unit)**: Validate loading / success / failure states, intercept CRUD logic, confirm stream subscription cancellation, and verify direct reactive I/O operations. Powered by `bloc_test` and `mocktail`.
 - **Widget Tests (UI)**: Dedicated, simulated resources using `async*` events are injected into the widgets to faithfully replicate the database's delay cycle (fixing potential `pumpAndSettle` pitfalls).
 - **Golden Tests**: Verifies UI components pixel-by-pixel for Todo empty/populated states and the Settings screen, freezing viewport size, theme-related inputs, and deterministic fixture data.
 
@@ -248,8 +248,9 @@ flutter test
 - [x] GetIt & Injectable compile-time dependency injection
 - [x] Isar Community database integration with reactive streams
 - [x] Strict I/O Isolation Pattern via Synchronous Mappers
+- [x] Automated Layer Isolation Guardrails (`import_lint`)
 - [x] Comprehensive Test Suite (Unit, Widget, and Golden Tests)
 - [x] Production-ready GitHub Actions CI/CD Pipeline
-- [ ] Multi-language Localization (intl wrapper enhancement)
+- [x] Multi-language Localization (intl & l10n architectural blueprint)
 - [ ] Reference Network Sync Module (Edge-to-Cloud sync draft)
 - [ ] CLI Feature Template Generator for faster scaffolding

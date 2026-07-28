@@ -72,11 +72,10 @@ dart format --set-exit-if-changed lib test
 log_success "Codebase formatting aligns with style specifications."
 
 # ------------------------------------------------------------------------------
-log_step "5" "Executing static analysis (Linter & Custom Lint)..."
+log_step "5" "Executing static analysis (Linter & Import Lint)..."
 # ------------------------------------------------------------------------------
 # Evaluates project architecture against analysis_options.yaml rules
 flutter analyze
-dart run custom_lint || true
 log_success "Static analysis passed with zero warnings or errors."
 
 # ------------------------------------------------------------------------------
