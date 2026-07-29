@@ -35,3 +35,4 @@ import_lint:
       target: "package:flutter_bloc_boilerplate/features/**/presentation/**"
       from: "package:flutter_bloc_boilerplate/features/**/data/**"
       except: []
+      severity: error
